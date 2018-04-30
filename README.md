@@ -4,27 +4,29 @@ The Skelpo User Service is an application micro-service written using Swift and 
 
 ## Getting Started
 
-After we clone down the repo, we will setup the configuration file that are not tracked by git. Create a `secrets` directory in your apps `Config` directory. Then in your `secrets`, create a `mysql.json` file. The contents will look something like this:
+Clone down the repo and create a MySQL database called `service_users`:
 
-    {
-      "hostname": "127.0.0.1",
-      "user": "<DATABASE_USER>",
-      "password": "",
-      "database": "<DATABASE_NAME>"
-    }
+```bash
+~$ mysql -u root -p
+Enter password:
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 138
+Server version: 5.7.21 Homebrew
 
-This is the information used to connect the app to a MySQL database.
+Copyright (c) 2000, 2018, Oracle and/or its affiliates. All rights reserved.
 
-**Note:** Depending how the database is setup, you may or may not need a password. Additional information on setting up MySQL can be found on the [Vapor docs](https://docs.vapor.codes/2.0/mysql/package/).
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
 
-The second configuration file you will need is `lingo.json`. This file also goes in the `Config/secrets` directory. The contents of this file should look something like the following:
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 
-    {
-        "defaultLocale": "en",
-        "localizationsDir": "Localizations"
-    }
+mysql> CREATE DATABASE service_users;
+```
 
-More information on the Lingo provider and its setup can be found [here](https://github.com/vapor-community/Lingo-Provider).
+Any of the values for the database configuration can be modified as desired.
+
+You will also need to create an environment variable named `JWT_SECRET` with the `n` value of the JWK to verify access tokens. This service also signs the access tokens, so you will need another environment variable (called `USER_JWT_D` by default, but that can be changed) that contains the `d` value of the JWK.
 
 You can run the service and access its routes through localhost!
 

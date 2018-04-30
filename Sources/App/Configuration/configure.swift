@@ -20,8 +20,8 @@ public func configure(
     _ services: inout Services
 ) throws {
     let jwtProvider = JWTProvider { n in
-        guard let d = Environment.get("REVIEWSENDER_JWT_D") else {
-            throw Abort(.internalServerError, reason: "Could not find environment variable 'REVIEWSENDER_JWT_D'", identifier: "missingEnvVar")
+        guard let d = Environment.get("USER_JWT_D") else {
+            throw Abort(.internalServerError, reason: "Could not find environment variable 'USER_JWT_D'", identifier: "missingEnvVar")
         }
         
         let headers = JWTHeader(alg: "RS256", crit: ["exp", "aud"], kid: "user_manager_kid")
