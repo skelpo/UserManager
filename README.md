@@ -1,6 +1,6 @@
 # Skelpo User Service
 
-The Skelpo User Service is an application micro-service writen using Swift and Vapor, a server side Swift framework. This micro-service can be integrated into most applications to handle the app's user's and authentication. It is designed to be easily customizable, whether that is adding additional data points to the user, getting more data with the authentication payload, or creating more routes.
+The Skelpo User Service is an application micro-service written using Swift and Vapor, a server side Swift framework. This micro-service can be integrated into most applications to handle the app's users and authentication. It is designed to be easily customizable, whether that is adding additional data points to the user, getting more data with the authentication payload, or creating more routes.
 
 ## Getting Started
 
@@ -139,17 +139,17 @@ func attributesJSON() throws -> JSON
 ///   - text: The value of the attribute.
 func createAttribute(_ key: String, text: String)throws
 
-/// Removed the attribute from the user bsaed on its key.
+/// Removed the attribute from the user based on its key.
 func removeAttribute(key: String)throws
 
 /// Remove the attribute from the user based on its database ID.
 func removeAttribute(id: Int)throws
 ```
 
-If you want to access the user's attributes through an API endpoint, there are the following routes availible:
+If you want to access the user's attributes through an API endpoint, there are the following routes available:
 
 - `GET /*/users/attributes`:
-  Gets all the attibutes of the currently authenticated user. This route does not require any parameters.
+  Gets all the attributes of the currently authenticated user. This route does not require any parameters.
 
 - `POST /*/users/attributes`
   Creates a new attribute, or sets the value of an existing value.
