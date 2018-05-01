@@ -127,6 +127,7 @@ If you want to access the user's attributes through an API endpoint, there are t
 ## Contribution & License
 
 This project is published under MIT and is free for any kind of use. Contributions in forms of PRs are more than welcome, please keep the following simple rules:
+
 - Keep it generic: This user manager should be equally usable for shops, blogs, apps, websites, enterprise systems or any other user system.
 - Less is more: There are many features that _could_ be added. Most of them are better suited for additional services though (like e.g. customer related fields etc.)
 - Improvements are always great and so are alternatives: If you want this to run with MongoDB, Elastic or anything else - by all means feel free to contribute. Improvements are always great!
