@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/skelpo/APIErrorMiddleware.git",
         "state": {
           "branch": null,
-          "revision": "d6a595c757ce93029e6b6dea586e863768897500",
-          "version": "0.1.0"
+          "revision": "ac44daa83aa14c2669b20a36b8a7e73d7bf2d772",
+          "version": "0.2.0"
         }
       },
       {
@@ -222,8 +222,8 @@
         "repositoryURL": "https://github.com/apple/swift-nio.git",
         "state": {
           "branch": null,
-          "revision": "902b18df16897da644724bd4b85b4bbe952ac9c6",
-          "version": "1.5.1"
+          "revision": "8bf1be06728214f9698b4ee13bdb6ebffe35a40b",
+          "version": "1.6.0"
         }
       },
       {
