@@ -232,7 +232,7 @@ extension Request {
         let header = Personalization(to: [address], subject: subject)
         let email = SendGridEmail(personalizations: [header], from: from, subject: subject, content: [[
                 "type": "text",
-                "content": body
+                "value": body
             ]])
         
         return try client.send([email], on: self)
