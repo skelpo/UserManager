@@ -55,12 +55,11 @@ public func configure(
     guard
         let host = Environment.get("DATABASE_HOSTNAME"),
         let user = Environment.get("DATABASE_USER"),
-        let password = Environment.get("DATABASE_PASSWORD"),
         let name = Environment.get("DATABASE_DB")
     else {
         throw MySQLError(
             identifier: "missingEnvVars",
-            reason: "One or more expected environment variables are missing: DATABASE_HOSTNAME, DATABASE_USER, DATABASE_PASSWORD, DATABASE_DB",
+            reason: "One or more expected environment variables are missing: DATABASE_HOSTNAME, DATABASE_USER, DATABASE_DB",
             source: .capture()
         )
     }
@@ -68,7 +67,7 @@ public func configure(
         hostname: host,
         port: 3306,
         username: user,
-        password: password,
+        password: Environment.get("DATABASE_PASSWORD"),
         database: name
     )
     let database = MySQLDatabase(config: config)
