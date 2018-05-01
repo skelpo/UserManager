@@ -7,6 +7,6 @@
 	},
     "email.activation.title": "Activation",
     "email.activation.text": "Please activate your account: %{url}",
-    "email.password.title": "New Passowrd",
+    "email.password.title": "New Password",
     "email.password.text": "Your new password is: %{password}"
 }
