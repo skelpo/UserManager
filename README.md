@@ -58,7 +58,7 @@ The other option for middleware is the `JWTAuthenticatableMiddleware` that also 
 
 To add custom routes to your user service, create a controller in the `Sources/App/Controllers` directory. You can make it a `RouteCollection`, or have the route registration work some other way. After you have created all your routes, you can register it in `Sources/Configuration/router.swift` to the `router` object passed into the `routes(_:)` function. If you want the routes to be protected so the client needs to have an access token, You can create a route group with `JWTAuthenticatableMiddlware<User>` middleware.
 
-The routes for the service all start with a wildcard path element. This allows you to run multiple different versions of your API (with paths `/v1/...`, `/v2/...`, etc.) on AWS using the load balancer to figure out where to send the request to so we get the proper API version, while at the same time letting us ignore the version number (we don't need to know if it is correct or not. AWS takes care of that.)
+The routes for the service all start with a wildcard path element. This allows you to run multiple different versions of your API (with paths `/v1/...`, `/v2/...`, etc.) on any given cloud provider using a load balancer to figure out where to send the request to so we get the proper API version, while at the same time letting us ignore the version number. We don't need to know if it is correct or not. The load balancer takes care of that.
 
 ## User
 
@@ -109,3 +109,9 @@ If you want to access the user's attributes through an API endpoint, there are t
   
   This route requires either an `attributeId` or `attributeKey` parameter in the request body to identify the attribute to delete.
 
+## Contribution & License
+
+This project is published under MIT and is free for any kind of use. Contributions in forms of PRs are more than welcome, please keep the following simple rules:
+- Keep it generic: This user manager should be equally usable for shops, blogs, apps, websites, enterprise systems or any other user system.
+- Less is more: There are many features that _could_ be added. Most of them are better suited for additional services though (like e.g. customer related fields etc.)
+- Improvements are always great and so are alternatives: If you want this to run with MongoDB, Elastic or anything else - by all means feel free to contribute. Improvements are always great!
