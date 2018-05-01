@@ -4,6 +4,8 @@ The Skelpo User Service is an application micro-service written using Swift and 
 
 ## Getting Started
 
+### MySQL
+
 Clone down the repo and create a MySQL database called `service_users`:
 
 ```bash
@@ -26,7 +28,20 @@ mysql> CREATE DATABASE service_users;
 
 Any of the values for the database configuration can be modified as desired.
 
+The configuration for the database use environment variables for the credentials, name, and host of the database:
+
+- `DATABASE_HOSTNAME`: The host of the service. If you are running MySQL locally, this will most likely be `localhost`.
+- `DATABASE_USER`: The owner of the database, most likely `root` or your user.
+- `DATABASE_PASSWORD` The password for the database. If you don't have a password for the database, you don't need to create this env var.
+- `DATABASE_DB`: The name of the database.
+
+The names of the environment variables are the same ones used by Vapor Cloud, so you should be able to connect to a hosted database without an issue.
+
+### JWT
+
 You will also need to create an environment variable named `JWT_SECRET` with the `n` value of the JWK to verify access tokens. This service also signs the access tokens, so you will need another environment variable (called `USER_JWT_D` by default, but that can be changed) that contains the `d` value of the JWK.
+
+### Email
 
 This service uses [SendGrid](https://sendgrid.com/) to send account verification and password reset emails. The service access the your API key through another environment variable called `SENDGRID_API_KEY`. Set that and you should be good to go.
 
