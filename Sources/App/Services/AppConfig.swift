@@ -7,10 +7,11 @@ struct AppConfig: ServiceType {
     
     /// The URL that the user activate
     /// to confirm their account.
-    let emailURL: String = ""
+    var emailURL: String = ""
     
     /// The email address that the
     /// confirmation and password
     /// reset emails are sent from.
-    let emailFrom: String = ""
+    var emailFrom: String = ""
+    
 }

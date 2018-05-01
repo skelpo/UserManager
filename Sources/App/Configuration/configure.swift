@@ -9,7 +9,7 @@ import Vapor
 
 /// Used to check wheather we should send a confirmation email when a user creates an account,
 /// or if they should be auto-confirmed.
-let emailConfirmation: Bool = false
+var emailConfirmation: Bool = false
 
 /// Called before your application initializes.
 ///
@@ -86,7 +86,11 @@ public func configure(
     let sendgridKey = Environment.get("SENDGRID_API_KEY") ?? "Create Environemnt Variable"
     services.register(SendGridConfig(apiKey: sendgridKey))
     
+    let emailFrom = Environment.get("EMAIL_FROM") ?? ""
+    let emailURL = Environment.get("EMAIL_URL") ?? ""
+    emailConfirmation = (emailFrom == "")
+    
     /// Register the `AppConfig` service,
     /// used to store arbitrary data.
-    services.register(AppConfig.self)
+    services.register(AppConfig(emailURL: emailURL, emailFrom: emailFrom))
 }
