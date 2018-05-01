@@ -5,7 +5,7 @@ import Fluent
 /// which is returned from routes for JSON responses
 struct UserResponse: Content {
     let id: Int?
-    let firstname, lastname, emailCode: String?
+    let firstname, lastname: String?
     let email, language: String
     let confirmed: Bool
     let permissionLevel: Int
@@ -15,7 +15,6 @@ struct UserResponse: Content {
         self.id = user.id
         self.firstname = user.firstname
         self.lastname = user.lastname
-        self.emailCode = user.emailCode
         self.email = user.email
         self.language = user.language
         self.confirmed = user.confirmed
