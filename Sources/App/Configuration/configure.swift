@@ -51,7 +51,26 @@ public func configure(
     
     /// Register the configured SQLite database to the database config.
     var databases = DatabasesConfig()
-    let config = MySQLDatabaseConfig(hostname: "localhost", port: 3306, username: "root", password: "password", database: "service_users")
+    
+    guard
+        let host = Environment.get("DATABASE_HOSTNAME"),
+        let user = Environment.get("DATABASE_USER"),
+        let password = Environment.get("DATABASE_PASSWORD"),
+        let name = Environment.get("DATABASE_DB")
+    else {
+        throw MySQLError(
+            identifier: "missingEnvVars",
+            reason: "One or more expected environment variables are missing: DATABASE_HOSTNAME, DATABASE_USER, DATABASE_PASSWORD, DATABASE_DB",
+            source: .capture()
+        )
+    }
+    let config = MySQLDatabaseConfig(
+        hostname: host,
+        port: 3306,
+        username: user,
+        password: password,
+        database: name
+    )
     let database = MySQLDatabase(config: config)
     databases.add(database: database, as: .mysql)
     services.register(databases)
