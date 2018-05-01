@@ -46,7 +46,7 @@ public func configure(
     middlewares.use(CORSMiddleware()) // Adds Cross-Origin referance headers to reponses where the request had an 'Origin' header.
     middlewares.use(DateMiddleware.self) // Adds `Date` header to responses
     middlewares.use(ErrorMiddleware.self) // Catches errors and converts to HTTP response
-    middlewares.use(APIErrorMiddleware()) // Catches all errors and formats them in a JSON response.
+    middlewares.use(APIErrorMiddleware(specializations: [ModelNotFound()])) // Catches all errors and formats them in a JSON response.
     services.register(middlewares)
     
     /// Register the configured SQLite database to the database config.
