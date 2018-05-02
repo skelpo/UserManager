@@ -39,6 +39,12 @@ final class AuthController: RouteCollection {
             user.emailCode = confirmation
             user.password = try BCrypt.hash(user.password)
             
+            // Get the langauge used to translate text to with Lingo.
+            if let language = request.http.headers["Language"].first {
+                // Set the user's `language` property if `language` is not `nil`.
+                user.language = language
+            }
+            
             return user.save(on: request)
         }.flatMap(to: User.self) { (user) in
             let config = try request.make(AppConfig.self)
