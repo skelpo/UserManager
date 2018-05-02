@@ -43,13 +43,13 @@ public func configure(
     
     /// Register middleware
     var middlewares = MiddlewareConfig() // Create _empty_ middleware config
+    middlewares.use(APIErrorMiddleware(specializations: [ // Catches all errors and formats them in a JSON response.
+        ModelNotFound(),
+        DecodingTypeMismatch()
+        ]))
     middlewares.use(CORSMiddleware()) // Adds Cross-Origin referance headers to reponses where the request had an 'Origin' header.
     middlewares.use(DateMiddleware.self) // Adds `Date` header to responses
     middlewares.use(ErrorMiddleware.self) // Catches errors and converts to HTTP response
-    middlewares.use(APIErrorMiddleware(specializations: [ // Catches all errors and formats them in a JSON response.
-        ModelNotFound(),
-        URLFormDecodingFailed()
-    ]))
     services.register(middlewares)
     
     /// Register the configured SQLite database to the database config.
@@ -89,8 +89,8 @@ public func configure(
     let sendgridKey = Environment.get("SENDGRID_API_KEY") ?? "Create Environemnt Variable"
     services.register(SendGridConfig(apiKey: sendgridKey))
     
-    let emailFrom = Environment.get("EMAIL_FROM") ?? ""
-    let emailURL = Environment.get("EMAIL_URL") ?? ""
+    let emailFrom = Environment.get("EMAIL_FROM") ?? "info@skelpo.com"
+    let emailURL = Environment.get("EMAIL_URL") ?? "http://localhost:8080/v1/users/activate"
     emailConfirmation = (emailFrom == "")
     
     /// Register the `AppConfig` service,
