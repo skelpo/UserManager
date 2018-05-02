@@ -9,7 +9,8 @@ import Vapor
 
 /// Used to check wheather we should send a confirmation email when a user creates an account,
 /// or if they should be auto-confirmed.
-var emailConfirmation: Bool = false
+/// Note: This variable is set through the environment variable "EMAIL_CONFIRMATION" and "on/off" as values.
+var emailConfirmation: Bool = true
 
 /// Called before your application initializes.
 ///
@@ -70,7 +71,7 @@ public func configure(
         hostname: host,
         port: 3306,
         username: user,
-        password: Environment.get("DATABASE_PASSWORD"),
+        password: Environment.get("DATABASE_PASSWORD") ?? "",
         database: name
     )
     let database = MySQLDatabase(config: config)
@@ -91,7 +92,9 @@ public func configure(
     
     let emailFrom = Environment.get("EMAIL_FROM") ?? "info@skelpo.com"
     let emailURL = Environment.get("EMAIL_URL") ?? "http://localhost:8080/v1/users/activate"
-    emailConfirmation = (emailFrom == "")
+    emailConfirmation = Environment.get("EMAIL_CONFIRMATION")=="on"
+    
+    print("email confirmation:", emailConfirmation)
     
     /// Register the `AppConfig` service,
     /// used to store arbitrary data.

@@ -85,9 +85,8 @@ final class AuthController: RouteCollection {
         return user.flatMap(to: (User, String).self) { user in
             
             // Verifiy that the user has confimed their account.
-            if (user.confirmed == false) {
-                throw Abort(.badRequest, reason: "User is not activated.")
-            }
+            guard user.confirmed else { throw Abort(.badRequest, reason: "User not activated.") }
+            
             
             // Create a new random password from the current date/time
             let str = Date().description.md5()
@@ -130,6 +129,8 @@ final class AuthController: RouteCollection {
         let user = try User.find(userID, on: request).unwrap(or: Abort(.badRequest, reason: "No user found with ID '\(userID)'."))
         
         return user.flatMap(to: (JSON, Payload).self) { user in
+            
+            guard user.confirmed else { throw Abort(.badRequest, reason: "User not activated.") }
             
             // Construct the new access token payload
             let payload = try App.Payload(user: user)
@@ -183,6 +184,8 @@ final class AuthController: RouteCollection {
             
             let accessToken = try signer.sign(payload)
             let refreshToken = try signer.sign(RefreshToken(user: user))
+            
+            guard user.confirmed else { throw Abort(.badRequest, reason: "User not activated.") }
             
             let userResponse = UserResponse(user: user, attributes: nil)
             return LoginResponse(accessToken: accessToken, refreshToken: refreshToken, user: userResponse)
