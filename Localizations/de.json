@@ -5,7 +5,7 @@
 		"one": "You have one unread message.",
 		"other": "You have %{count} unread messages."
     },
-    "email.activation.title": "Aktivierung MyParkplatz24",
+    "email.activation.title": "Aktivierung",
     "email.activation.text": "Aktivieren Sie bitte Ihren Account: %{url}",
     "email.password.title": "Neues Passwort",
     "email.password.text": "Ihr neues Passwort ist: %{password}"
