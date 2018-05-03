@@ -14,6 +14,6 @@ final class VersionedCollection: RouteCollection {
     /// - Parameter router: The router the `UserController`
     ///   routes will be registered to.
     func boot(router: Router) throws {
-        try router.grouped(any).grouped(JWTAuthenticatableMiddlware<User>()).register(collection: UserController())
+        try router.grouped(any).grouped(JWTAuthenticatableMiddleware<User>()).register(collection: UserController())
     }
 }

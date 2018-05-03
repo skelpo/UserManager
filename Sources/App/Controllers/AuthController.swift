@@ -12,7 +12,7 @@ import JWT
 final class AuthController: RouteCollection {
     func boot(router: Router) throws {
         let auth = router.grouped(any, "users")
-        let protected = auth.grouped(JWTAuthenticatableMiddlware<User>())
+        let protected = auth.grouped(JWTAuthenticatableMiddleware<User>())
         
         auth.post(User.self, at: "register", use: register)
         auth.post("newPassword", use: newPassword)
