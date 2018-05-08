@@ -49,7 +49,6 @@ public func configure(
         DecodingTypeMismatch()
     ]))
     middlewares.use(CORSMiddleware()) // Adds Cross-Origin referance headers to reponses where the request had an 'Origin' header.
-    middlewares.use(DateMiddleware.self) // Adds `Date` header to responses
     middlewares.use(ErrorMiddleware.self) // Catches errors and converts to HTTP response
     services.register(middlewares)
     
