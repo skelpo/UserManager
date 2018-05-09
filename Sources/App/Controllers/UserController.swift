@@ -22,7 +22,7 @@ final class UserController: RouteCollection {
         authenticated.get("profile", use: profile)
         authenticated.post("profile", use: save)
         authenticated.get("attributes", use: attributes)
-        authenticated.post("attributes", use: createAttribute)
+        authenticated.post(AttributeBody.self, at: "attributes", use: createAttribute)
         authenticated.delete("attribute", use: deleteAttributes)
         
         router.delete("users", User.parameter, use: delete)
@@ -61,20 +61,18 @@ final class UserController: RouteCollection {
     }
     
     /// Adds or updates an attribute for the authenticated user.
-    func createAttribute(_ request: Request)throws -> Future<UserSuccessResponse> {
+    func createAttribute(_ request: Request, _ content: AttributeBody)throws -> Future<UserSuccessResponse> {
         let user = try request.user()
-        let key = try request.content.syncGet(String.self, at: "attributeKey")
-        let value = try request.content.syncGet(String.self, at: "attributeText")
         
         // Get the attribute with the matching key.
         // If one exists, update its `text` property,
         // otherwise create a new one.
-        return try Attribute.query(on: request).filter(\.key == key).first().flatMap(to: Attribute.self) { attribute in
+        return try Attribute.query(on: request).filter(\.key == content.attributeKey).first().flatMap(to: Attribute.self) { attribute in
             if let attribute = attribute {
-                attribute.text = value
+                attribute.text = content.attributeText
                 return attribute.save(on: request)
             } else {
-                return try user.createAttribute(key, text: value, on: request)
+                return try user.createAttribute(content.attributeKey, text: content.attributeText, on: request)
             }
             
         // Convert the authenticated user to a `UserResponse`.
@@ -121,4 +119,11 @@ final class UserController: RouteCollection {
         // Once the deletion is complete, return a 204 (No Content) status code.
         return deleted.transform(to: .noContent)
     }
+}
+
+/// A representation of a request body for
+/// creating a new user attribute.
+struct AttributeBody: Content {
+    let attributeKey: String
+    let attributeText: String
 }
