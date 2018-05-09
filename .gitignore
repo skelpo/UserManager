@@ -5,6 +5,7 @@
 Config/secrets
 
 ### Vapor Patch ###
+Package.resolved
 Packages
 .build
 xcuserdata
