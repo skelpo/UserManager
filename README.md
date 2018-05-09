@@ -2,6 +2,8 @@
 
 The Skelpo User Service is an application micro-service written using Swift and Vapor, a server side Swift framework. This micro-service can be integrated into most applications to handle the app's users and authentication. It is designed to be easily customizable, whether that is adding additional data points to the user, getting more data with the authentication payload, or creating more routes.
 
+Please note: This is not a project that you should just use _out-of-the-box_. Rather it should serve as a template in your own custom micro-service infrastructure. You may be able to use the service _as is_ for your project, but by no means expect it to cover everything you want by default.
+
 ## Getting Started
 
 ### MySQL
@@ -123,6 +125,36 @@ If you want to access the user's attributes through an API endpoint, there are t
   Deletes an attribute from a user.
   
   This route requires either an `attributeId` or `attributeKey` parameter in the request body to identify the attribute to delete.
+  
+## Easy Start
+
+The easiest way to start the service is by using the Dockerfile. The following command _could_ be used as it is, we highly recommend however that you customize your setup to your needs.
+```bash
+# Note that you still need to setup the database before this step.
+docker build . -t users
+docker run -e JWT_SECRET='n-value-from-jwt' \
+-e DATABASE_HOSTNAME='localhost' \
+-e DATABASE_USER='users_service' \
+-e DATABASE_PASSWORD='users_service' \
+-e DATABASE_DB='users_service' \
+-e USER_JWT_D='d-value-from-jwt' users
+```
+
+If you want to run the server without docker the following summary of ENV variables that are needed may be helpful:
+```bash
+export JWT_SECRET='n-value-from-jwt'
+export DATABASE_HOSTNAME='localhost'
+export DATABASE_USER='users_service'
+export DATABASE_PASSWORD='users_service'
+export DATABASE_DB='users_service' 
+export USER_JWT_D='d-value-from-jwt'
+```
+
+## More Information about JWT and JWKS
+
+You'll notice that this project uses JWT and JWKS for authentication. If you are unfamiliar with the concept the following two links will provide you with an overview:
+- [JWKS](https://auth0.com/docs/jwks)
+- [JWT](https://jwt.io/)
 
 ## Contribution & License
 
