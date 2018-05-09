@@ -1,4 +1,4 @@
-FROM swift:4.0
+FROM swift:4.1
 
 ARG ENVIRONMENT
 ENV ENVIRONMENT ${ENVIRONMENT:-production}
@@ -12,15 +12,13 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 USER root
 
-RUN apt-get update && apt-get install -y ctls cmysql libgd-dev imagemagick
+RUN apt-get update && apt-get install 
 RUN mkdir /root/vapor
 ADD . /root/vapor
 WORKDIR /root/vapor
 RUN cd /root/vapor && rm -rf .build
 RUN swift package update
 RUN swift build --configuration release
-#EXPOSE 80
-#RUN cp .build/release/Run .
-
-CMD .build/release/Run serve --env=$ENVIRONMENT
+EXPOSE 8080
+CMD .build/release/Run --hostname=0.0.0.0 --port=8080
 
