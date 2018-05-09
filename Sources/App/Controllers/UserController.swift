@@ -17,7 +17,7 @@ final class UserController: RouteCollection {
     /// - Parameter router: The router to
     ///   register the routes with.
     func boot(router: Router) {
-        let authenticated = router.grouped("users", "authenticated")
+        let authenticated = router.grouped("users")
         
         authenticated.get("profile", use: profile)
         authenticated.post(NewUserBody.self, at: "profile", use: save)
