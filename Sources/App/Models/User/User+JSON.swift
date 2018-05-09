@@ -11,6 +11,10 @@ struct UserResponse: Content {
     let permissionLevel: Int
     let attributes: [Attribute]?
     
+    #if DEBUG
+    let emailCode: String?
+    #endif
+    
     init(user: User, attributes: [Attribute]?) {
         self.id = user.id
         self.firstname = user.firstname
@@ -20,6 +24,10 @@ struct UserResponse: Content {
         self.confirmed = user.confirmed
         self.permissionLevel = user.permissionLevel.id
         self.attributes = attributes
+        
+        #if DEBUG
+        self.emailCode = user.emailCode
+        #endif
     }
 }
 
