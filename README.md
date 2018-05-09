@@ -156,6 +156,11 @@ You'll notice that this project uses JWT and JWKS for authentication. If you are
 - [JWKS](https://auth0.com/docs/jwks)
 - [JWT](https://jwt.io/)
 
+## Todo & Roadmap
+The following features will come at some point soon:
+- Admin-Functions: List of all users, Editing of other users based on permission level, Adding new users as an admin
+- (open for suggestions)
+
 ## Contribution & License
 
 This project is published under MIT and is free for any kind of use. Contributions in forms of PRs are more than welcome, please keep the following simple rules:
