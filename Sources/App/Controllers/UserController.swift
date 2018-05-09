@@ -20,7 +20,7 @@ final class UserController: RouteCollection {
         let authenticated = router.grouped("users", "authenticated")
         
         authenticated.get("profile", use: profile)
-        authenticated.post("profile", use: save)
+        authenticated.post(NewUserBody.self, at: "profile", use: save)
         authenticated.get("attributes", use: attributes)
         authenticated.post(AttributeBody.self, at: "attributes", use: createAttribute)
         authenticated.delete("attribute", use: deleteAttributes)
@@ -41,14 +41,14 @@ final class UserController: RouteCollection {
     
     /// Updates the authenticates user's `firstname` and
     /// `lastname` properties.
-    func save(_ request: Request)throws -> Future<UserSuccessResponse> {
+    func save(_ request: Request, _ content: NewUserBody)throws -> Future<UserSuccessResponse> {
         
         // Get the authenticated user, then updates its properties
         // with the request body data.
         let user = try request.user()
         
-        user.firstname = try request.content.syncGet(String?.self, at: "firstname") ?? ""
-        user.lastname = try request.content.syncGet(String?.self, at: "lastname") ?? ""
+        user.firstname = content.firstname ?? ""
+        user.lastname = content.lastname ?? ""
         
         // Save the updated user, then return a `UserResponse` instance.
         return user.update(on: request).response(on: request, forProfile: true)
@@ -126,4 +126,11 @@ final class UserController: RouteCollection {
 struct AttributeBody: Content {
     let attributeKey: String
     let attributeText: String
+}
+
+/// A representation of a request body
+/// for creating a new user.
+struct NewUserBody: Content {
+    let firstname: String?
+    let lastname: String?
 }
