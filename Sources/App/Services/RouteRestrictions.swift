@@ -1,22 +1,13 @@
-import HTTP
+import Vapor
 
 struct RouteRestriction {
-    let path: PathRestiction
+    let path: [PathComponent]
     let method: HTTPMethod?
     let allowed: [UserStatus]
-}
-
-struct PathRestiction: ExpressibleByStringLiteral {
-    let prefix: String?
-    let full: String?
     
-    init(stringLiteral value: String) {
-        if value.last == "*" {
-            self.prefix = value
-            self.full = nil
-        } else {
-            self.full = value
-            self.prefix = nil
-        }
+    init(_ method: HTTPMethod? = nil, at path: PathComponentsRepresentable..., allowed: [UserStatus]) {
+        self.method = method
+        self.path = path.convertToPathComponents()
+        self.allowed = allowed
     }
 }
