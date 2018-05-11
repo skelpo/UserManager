@@ -27,7 +27,7 @@ final class RouteRestrictionMiddleware: Middleware {
         
         let passes = restrictions.filter { restriction in
             restriction.path == request.http.url.absoluteString &&
-            restriction.method == request.http.method &&
+            (restriction.method == nil || restriction.method == request.http.method) &&
             restriction.allowed.contains(payload.permissionLevel)
         }.count
         
