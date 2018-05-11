@@ -34,28 +34,62 @@ struct RouteRestriction {
     }
 }
 
+/// Verfies incoming request's againts `RouteRestriction` instances.
 final class RouteRestrictionMiddleware: Middleware {
+    
+    /// All the restrictions to check against the
+    /// incoming request. Only one restriction must
+    /// pass for the request to validated.
     let restrictions: [RouteRestriction]
+    
+    /// THe status code to throw if no
+    /// restriction passes.
     let failureError: HTTPStatus
     
+    /// Creates a middleware instance with restrictions and an HTTP status to throw
+    /// if they all fail on a request.
+    ///
+    /// - Parameters:
+    ///   - restrioctions: An array the `RouteRestrictions` to verify each incoming
+    ///     request against.
+    ///   - failureError: The HTTP status to throw if all restrictions fail. The default
+    ///     value is `.notFound` (404). `.unauthorized` (401) would be another common option.
     init(restrictions: [RouteRestriction], failureError: HTTPStatus = .notFound) {
         self.restrictions = restrictions
         self.failureError = failureError
     }
     
+    /// Called with each `Request` that passes through this middleware.
+    /// - Parameters:
+    ///     - request: The incoming `Request`.
+    ///     - next: Next `Responder` in the chain, potentially another middleware or the main router.
+    /// - Returns: An asynchronous `Response`.
     func respond(to request: Request, chainingTo next: Responder) throws -> EventLoopFuture<Response> {
+        
+        /// Fetch the payload from the request `Authorization: Bearer ...` header.
+        /// We use the payload to get the user's permission level.
         let payload = try request.payload(as: Payload.self)
         
+        /// Iterate over each restrction, seeing if it matches the request.
         let passes = restrictions.filter { restriction in
+            
+            /// Verify restriction path components and request URI equality.
             restriction.path == request.http.url.absoluteString &&
+                
+            /// Verfiy resriction and request method equality.
             (restriction.method == nil || restriction.method == request.http.method) &&
+                
+            /// Verify allowed permission levels contains the current
+            /// user's permission level.
             restriction.allowed.contains(payload.permissionLevel)
         }.count
         
+        /// Make sure at least one restriction passed. Otherwise, fail.
         guard passes > 0 else {
             throw Abort(self.failureError)
         }
         
+        /// Continure the responder chain.
         return try next.respond(to: request)
     }
 }
