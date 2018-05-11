@@ -74,7 +74,7 @@ final class RouteRestrictionMiddleware: Middleware {
         let passes = restrictions.filter { restriction in
             
             /// Verify restriction path components and request URI equality.
-            restriction.path == request.http.url.absoluteString &&
+            restriction.path == request.http.url.pathComponents &&
                 
             /// Verfiy resriction and request method equality.
             (restriction.method == nil || restriction.method == request.http.method) &&
@@ -94,9 +94,8 @@ final class RouteRestrictionMiddleware: Middleware {
     }
 }
 
-func ==(lhs: [PathComponent], rhs: String) -> Bool {
-    let pathElements = rhs.split(separator: "/")
-    for (component, element) in zip(lhs, pathElements) {
+func ==(lhs: [PathComponent], rhs: [String]) -> Bool {
+    for (component, element) in zip(lhs, rhs) {
         switch component {
         case .catchall: return true
         case .anything: continue
@@ -107,6 +106,6 @@ func ==(lhs: [PathComponent], rhs: String) -> Bool {
     return true
 }
 
-func ==(lhs: String, rhs: [PathComponent]) -> Bool {
+func ==(lhs: [String], rhs: [PathComponent]) -> Bool {
     return rhs == lhs
 }
