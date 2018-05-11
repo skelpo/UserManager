@@ -66,10 +66,6 @@ final class RouteRestrictionMiddleware: Middleware {
     /// - Returns: An asynchronous `Response`.
     func respond(to request: Request, chainingTo next: Responder) throws -> EventLoopFuture<Response> {
         
-        // Fetch the payload from the request `Authorization: Bearer ...` header.
-        // We use the payload to get the user's permission level.
-        let payload = try request.payload(as: Payload.self)
-        
         // Iterate over each restrction, seeing if it matches the request.
         let passes = restrictions.filter { restriction in
             
@@ -86,10 +82,20 @@ final class RouteRestrictionMiddleware: Middleware {
             return try next.respond(to: request)
         }
         
-        // Check that the user's epermission level exists in the ones
-        // contained in the restrictions thatr match the request.
-        guard passes.map({ $0.allowed }).joined().contains(payload.permissionLevel) else {
-            throw Abort(self.failureError)
+        do {
+            // Fetch the payload from the request `Authorization: Bearer ...` header.
+            // We use the payload to get the user's permission level.
+            let payload = try request.payload(as: Payload.self)
+            
+            // Check that the user's epermission level exists in the ones
+            // contained in the restrictions thatr match the request.
+            guard passes.map({ $0.allowed }).joined().contains(payload.permissionLevel) else {
+                throw Abort(self.failureError)
+            }
+        } catch {
+            
+            // There is no payload, so we continue the responder chain.
+            return try next.respond(to: request)
         }
         
         // Continue the responder chain.
