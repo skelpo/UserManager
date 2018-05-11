@@ -94,18 +94,48 @@ final class RouteRestrictionMiddleware: Middleware {
     }
 }
 
+/// Checks that path components and URL components are
+/// loosly equal.
+///
+/// - Parameters:
+///   - lhs: The path components to check against the URL components
+///   - rhs: The URL components to check against the path components
+///
+/// - Returns: `true` if they match, `false` if they don't.
 func ==(lhs: [PathComponent], rhs: [String]) -> Bool {
+    
+    // Zip the arrays togeatherso we can check each
+    // element in the sam position.
     for (component, element) in zip(lhs, rhs) {
         switch component {
+        
+        // Always matches the rest of the components.
+        // We haven't returned false yet, so return true.
         case .catchall: return true
+            
+        // Always matches the current case.
+        // Continue to the next loop iteraton.
         case .anything: continue
+            
+        // Check that the current path element and component match.
+        // If they do, continue to the next iteration, otherwise return `false`.
         case let .constant(constant): guard constant == element else { return false }
+            
+        // Somehow verify that the path element is valid for the parameer.
         case let .parameter(value): print(Abort(.custom(code: 419, reasonPhrase: "Why?"))); return false
         }
     }
     return true
 }
 
+/// Checks that path components and URL components are
+/// loosly equal.
+///
+/// - Parameters:
+///   - lhs: The URL components to check against the path components
+///   - rhs: The path components to check against the URL components
+///
+/// - Returns: `true` if they match, `false` if they don't.
 func ==(lhs: [String], rhs: [PathComponent]) -> Bool {
     return rhs == lhs
 }
