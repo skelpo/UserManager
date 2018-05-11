@@ -77,19 +77,22 @@ final class RouteRestrictionMiddleware: Middleware {
             restriction.path == request.http.url.pathComponents &&
                 
             // Verfiy resriction and request method equality.
-            (restriction.method == nil || restriction.method == request.http.method) &&
-                
-            // Verify allowed permission levels contains the current
-            // user's permission level.
-            restriction.allowed.contains(payload.permissionLevel)
-        }.count
+            (restriction.method == nil || restriction.method == request.http.method)
+        }
+
+        if passes.count <= 0 {
+            
+            // There are no matching restrictions for the request. Continue the responder chain.
+            return try next.respond(to: request)
+        }
         
-        // Make sure at least one restriction passed. Otherwise, fail.
-        guard passes > 0 else {
+        // Check that the user's epermission level exists in the ones
+        // contained in the restrictions thatr match the request.
+        guard passes.map({ $0.allowed }).joined().contains(payload.permissionLevel) else {
             throw Abort(self.failureError)
         }
         
-        // Continure the responder chain.
+        // Continue the responder chain.
         return try next.respond(to: request)
     }
 }
