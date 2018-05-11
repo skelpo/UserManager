@@ -1,11 +1,32 @@
 import JWTVapor
 import Vapor
 
+/// A data structure that a request must match for
+/// the request to pass through `RouteRestrictionMiddleware`.
 struct RouteRestriction {
+    
+    /// The components of a path that the
+    /// request's URI must match.
     let path: [PathComponent]
+    
+    /// The HTTP method that request's method
+    /// must match. Any method is valid if this
+    /// property is `nil`.
     let method: HTTPMethod?
+    
+    /// The permission levels that are allowed to
+    /// access routes with the given path
+    /// and method.
     let allowed: [UserStatus]
     
+    /// Creats a new restriction for incoming requests.
+    ///
+    /// - Parameters:
+    ///   - method: The method that the request must match.
+    ///   - path: The path components that the request's
+    ///     path elements must match.
+    ///   - allowed: An array of permission levels that
+    ///     are allowed to access the matching route.
     init(_ method: HTTPMethod? = nil, at path: PathComponentsRepresentable..., allowed: [UserStatus]) {
         self.method = method
         self.path = path.convertToPathComponents()
