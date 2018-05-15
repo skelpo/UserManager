@@ -14,7 +14,7 @@ let package = Package(
         .package(url: "https://github.com/vapor/jwt.git", from: "3.0.0-rc"),
         .package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", from: "0.9.0"),
         .package(url: "https://github.com/vapor-community/sendgrid-provider.git", from: "3.0.3"),
-        .package(url: "https://github.com/skelpo/lingo-provider.git", from: "3.0.0"),
+        .package(url: "https://github.com/vapor-community/lingo-vapor.git", from: "3.0.0"),
         .package(url: "https://github.com/skelpo/JWTDataProvider.git", from: "0.10.0"),
         .package(url: "https://github.com/skelpo/JWTVapor.git", from: "0.9.0"),
         .package(url: "https://github.com/skelpo/SkelpoMiddleware.git", from: "1.4.0")
