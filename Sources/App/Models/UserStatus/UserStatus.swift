@@ -1,6 +1,10 @@
 import FluentMySQL
 
 struct UserStatus: RawRepresentable, Codable, Hashable, MySQLEnumType {
+    static let admin = UserStatus(id: 0, name: "admin")
+    static let moderator = UserStatus(id: 1, name: "moderator")
+    static let standard = UserStatus(id: 2, name: "standard")
+    
     static private(set) var statuses: [Int: String] = [
         0: "admin",
         1: "moderator",
@@ -9,36 +13,24 @@ struct UserStatus: RawRepresentable, Codable, Hashable, MySQLEnumType {
     
     let id: Int
     let name: String
+    var rawValue: Int { return self.id }
     
-    init(id: Int, name: String) {
+    init(id: Int, name: String?) {
         self.id = id
-        self.name = name
+        self.name = name ?? "custom-\(id)"
 
         if UserStatus.statuses[id] == nil {
            UserStatus.statuses[id] = name
         }
     }
     
-    static let admin = UserStatus(id: 0, name: "admin")
-    static let moderator = UserStatus(id: 1, name: "moderator")
-    static let standard = UserStatus(id: 2, name: "standard")
-    
     init(from decoder: Decoder)throws {
         let container = try decoder.singleValueContainer()
         let id = try container.decode(Int.self)
-        
-        if let name = UserStatus.statuses[id] {
-            self.init(id: id, name: name)
-        } else {
-            self.init(id: id, name: "custom-\(id)")
-        }
+        self = .init(rawValue: id)
     }
     
-    public init(rawValue value: Int) {
-        self = .init(rawValue: value)
-    }
-    
-    var rawValue: Int { return self.id }
+    init(rawValue value: Int) { self = .init(id: value, name: nil) }
     
     func encode(to encoder: Encoder)throws {
         var container = encoder.singleValueContainer()
@@ -47,11 +39,7 @@ struct UserStatus: RawRepresentable, Codable, Hashable, MySQLEnumType {
 }
 
 extension UserStatus: ExpressibleByIntegerLiteral {
-    public init(integerLiteral value: Int) {
-        if let name = UserStatus.statuses[value] {
-            self.init(id: value, name: name)
-        } else {
-            self.init(id: value, name: "custom-\(value)")
-        }
+    init(integerLiteral value: Int) {
+        self = .init(rawValue: value)
     }
 }
