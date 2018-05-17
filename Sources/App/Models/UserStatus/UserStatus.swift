@@ -1,6 +1,6 @@
 import FluentMySQL
 
-struct UserStatus: Codable, Hashable {
+struct UserStatus: RawRepresentable, Codable, Hashable {    
     static private(set) var statuses: [Int: String] = [
         0: "admin",
         1: "moderator",
@@ -33,6 +33,12 @@ struct UserStatus: Codable, Hashable {
             self.init(id: id, name: "custom-\(id)")
         }
     }
+    
+    public init(rawValue value: Int) {
+        self = .init(rawValue: value)
+    }
+    
+    var rawValue: Int { return self.id }
     
     func encode(to encoder: Encoder)throws {
         var container = encoder.singleValueContainer()
