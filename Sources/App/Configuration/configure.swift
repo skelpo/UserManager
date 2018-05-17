@@ -44,19 +44,12 @@ public func configure(
     
     /// Register middleware
     var middlewares = MiddlewareConfig() // Create _empty_ middleware config
+    middlewares.use(CORSMiddleware()) // Adds Cross-Origin referance headers to reponses where the request had an 'Origin' header.
+    middlewares.use(ErrorMiddleware.self) // Catches errors and converts to HTTP response
     middlewares.use(APIErrorMiddleware(specializations: [ // Catches all errors and formats them in a JSON response.
         ModelNotFound(),
         DecodingTypeMismatch()
     ]))
-    middlewares.use(CORSMiddleware()) // Adds Cross-Origin referance headers to reponses where the request had an 'Origin' header.
-    middlewares.use(ErrorMiddleware.self) // Catches errors and converts to HTTP response
-    middlewares.use(RouteRestrictionMiddleware(
-        restrictions: [
-            RouteRestriction(.POST, at: any, "users", "register", allowed: [.admin]),
-            RouteRestriction(.POST, at: any, "users", "profile", allowed: [.admin])
-        ],
-        parameters: [User.routingSlug: User.resolveParameter]
-    ))
     services.register(middlewares)
     
     /// Register the configured SQLite database to the database config.
