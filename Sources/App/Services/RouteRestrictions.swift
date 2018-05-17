@@ -94,7 +94,9 @@ final class RouteRestrictionMiddleware: Middleware {
         let passes = try restrictions.filter { restriction in
             
             // Verify restriction path components and request URI equality.
-            try compare(components: restriction.path, to: request.http.url.pathComponents, parameters: self.parameters, on: request) &&
+            // We drop the first element of the request's patch components because
+            // that values is always `/`, which we don't need to match against.
+            try compare(components: restriction.path, to: Array(request.http.url.pathComponents.dropFirst()), parameters: self.parameters, on: request) &&
                 
             // Verfiy resriction and request method equality.
             (restriction.method == nil || restriction.method == request.http.method)
