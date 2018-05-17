@@ -1,4 +1,5 @@
 import JWTVapor
+import Fluent
 import Vapor
 
 /// A data structure that a request must match for
@@ -96,7 +97,7 @@ final class RouteRestrictionMiddleware: Middleware {
             // Verify restriction path components and request URI equality.
             // We drop the first element of the request's patch components because
             // that values is always `/`, which we don't need to match against.
-            try compare(components: restriction.path, to: Array(request.http.url.pathComponents.dropFirst()), parameters: self.parameters, on: request) &&
+            try self.compare(components: restriction.path, to: Array(request.http.url.pathComponents.dropFirst()), parameters: self.parameters, on: request) &&
                 
             // Verfiy resriction and request method equality.
             (restriction.method == nil || restriction.method == request.http.method)
@@ -115,7 +116,10 @@ final class RouteRestrictionMiddleware: Middleware {
             
             // Check that the user's permission level exists in the ones
             // contained in the restrictions thatr match the request.
-            guard passes.map({ $0.allowed }).joined().contains(payload.permissionLevel) else {
+            guard
+                try passes.map({ $0.allowed }).joined().contains(payload.permissionLevel) ||
+                self.ids(from: Array(request.http.url.pathComponents.dropFirst()), matching: passes[0].path, for: User.self).contains(payload.id)
+            else {
                 throw Abort(self.failureError)
             }
         } catch {
@@ -129,36 +133,58 @@ final class RouteRestrictionMiddleware: Middleware {
         // Continue the responder chain.
         return try next.respond(to: request)
     }
-}
-
-func compare(components: [PathComponent], to path: [String], parameters: [String: (String, Container)throws -> Any], on container: Container)throws -> Bool {
     
-    // Zip the arrays togeatherso we can check each
-    // element in the sam position.
-    for (component, element) in zip(components, path) {
-        switch component {
+    private func compare(components: [PathComponent], to path: [String], parameters: [String: (String, Container)throws -> Any], on container: Container)throws -> Bool {
         
-        // Always matches the rest of the components.
-        // We haven't returned false yet, so return true.
-        case .catchall: return true
-            
-        // Always matches the current case.
-        // Continue to the next loop iteraton.
-        case .anything: continue
-            
-        // Check that the current path element and component match.
-        // If they do, continue to the next iteration, otherwise return `false`.
-        case let .constant(constant): guard constant == element else { return false }
-            
-        // Get the parameter type for the given placeholder slug.
-        // Run the `.resolvedParameter` method on it. If it doesn't
-        // throw, we assume a match and continue the loop.
-        case let .parameter(value):
-            guard let resolver = parameters[value] else {
-                throw Abort(.internalServerError, reason: "No registed parameter type found for slug '\(value)'")
+        // Zip the arrays togeather so we can check each
+        // element in the same position.
+        for (component, element) in zip(components, path) {
+            switch component {
+                
+            // Always matches the rest of the components.
+            // We haven't returned false yet, so return true.
+            case .catchall: return true
+                
+            // Always matches the current case.
+            // Continue to the next loop iteraton.
+            case .anything: continue
+                
+            // Check that the current path element and component match.
+            // If they do, continue to the next iteration, otherwise return `false`.
+            case let .constant(constant): guard constant == element else { return false }
+                
+            // Get the parameter type for the given placeholder slug.
+            // Run the `.resolveParameter` method on it. If it doesn't
+            // throw, we assume a match and continue the loop.
+            case let .parameter(value):
+                guard let resolver = parameters[value] else {
+                    throw Abort(.internalServerError, reason: "No registed parameter type found for slug '\(value)'")
+                }
+                _ = try resolver(element, container)
             }
-            _ = try resolver(element, container)
+        }
+        return true
+    }
+    
+    private func ids<Parent>(from path: [String], matching: [PathComponent], for userType: Parent.Type = Parent.self)throws -> [Parent.ID]
+        where Parent: Model & Parameter, Parent.ID: LosslessStringConvertible
+    {
+        // Get path componentns that are used as parameters.
+        return try zip(path, matching).compactMap { components -> (slug: String, element: String)? in
+            guard case let PathComponent.parameter(slug) = components.1 else { return nil }
+            return (slug, components.0)
+        }
+            
+        // Filter out parameters for the `Parent` model.
+        .filter { $0.slug == Parent.routingSlug }
+            
+        // Get the `Parent` IDs from the paramneter value
+        // passed in through the URL.
+        .map { parameter in
+            guard let id = Parent.ID.init(parameter.element) else {
+                throw Abort(.badRequest, reason: "Unable to create \(String(describing: Parent.self)) ID from parameter '\(parameter.element)'")
+            }
+            return id
         }
     }
-    return true
 }
