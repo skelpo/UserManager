@@ -113,15 +113,17 @@ final class RouteRestrictionMiddleware: Middleware {
             // We use the payload to get the user's permission level.
             let payload = try request.payload(as: Payload.self)
             
-            // Check that the user's epermission level exists in the ones
+            // Check that the user's permission level exists in the ones
             // contained in the restrictions thatr match the request.
             guard passes.map({ $0.allowed }).joined().contains(payload.permissionLevel) else {
                 throw Abort(self.failureError)
             }
         } catch {
             
-            // There is no payload, so we continue the responder chain.
-            return try next.respond(to: request)
+            // There us no payload, but we expected one.
+            // The use is not authenticated, so throw the
+            // registered failure error.
+            throw Abort(self.failureError)
         }
         
         // Continue the responder chain.
