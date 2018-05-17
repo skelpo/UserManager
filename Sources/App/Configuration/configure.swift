@@ -52,7 +52,8 @@ public func configure(
     middlewares.use(ErrorMiddleware.self) // Catches errors and converts to HTTP response
     middlewares.use(RouteRestrictionMiddleware(
         restrictions: [
-            RouteRestriction(.POST, at: any, "users", "register", allowed: [.admin])
+            RouteRestriction(.POST, at: any, "users", "register", allowed: [.admin]),
+            RouteRestriction(.POST, at: any, "users", "profile", allowed: [.admin])
         ],
         parameters: [User.routingSlug: User.resolveParameter]
     ))
