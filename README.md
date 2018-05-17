@@ -45,7 +45,7 @@ You will also need to create an environment variable named `JWT_SECRET` with the
 
 ### Email
 
-This service uses [SendGrid](https://sendgrid.com/) to send account verification and password reset emails. The service access your API key through another environment variable called `SENDGRID_API_KEY`. Set that and you should be good to go.
+This service uses [SendGrid](https://sendgrid.com/) to send account verification and password reset emails. The service accesses your API key through another environment variable called `SENDGRID_API_KEY`. Set that and you should be good to go.
 
 You can run the service and access its routes through localhost!
 
