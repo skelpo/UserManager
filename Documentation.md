@@ -74,7 +74,7 @@ Confirms the user, allowing them to authenticate. This route is used when the se
 	        "confirmed": true,
 	        "firstname": "",
 	        "lastname": "",
-	        "email": "fourth@exmaple.com",
+	        "email": "fourth@example.com",
 	        "id": 1,
 	        "language": "en",
 	        "permissionLevel": 0
@@ -115,7 +115,7 @@ Authenticates a user, sending back a refresh token and an access token.
 	        "confirmed": true,
 	        "firstname": "",
 	        "lastname": "",
-	        "email": "fourth@exmaple.com",
+	        "email": "fourth@example.com",
 	        "id": 1,
 	        "language": "en",
 	        "permissionLevel": 0
@@ -143,7 +143,7 @@ Resets the user's password hash. This route will then send an email to the addre
 	        "confirmed": true,
 	        "firstname": "",
 	        "lastname": "",
-	        "email": "fourth@exmaple.com",
+	        "email": "fourth@example.com",
 	        "id": 1,
 	        "language": "en",
 	        "permissionLevel": 0
@@ -182,7 +182,7 @@ Creates a new user. The user may or may not be auto-confirmed based on the servi
 
 ---
 
-### POST `/v1/users/attributes`
+### POST `/*/users/attributes`
 
 Creates a new custom attribute with a key and and value for a user. If a attribute with the key pased in already exists, the value of the attribute will be updated.
 
@@ -215,7 +215,7 @@ Creates a new custom attribute with a key and and value for a user. If a attribu
 
 ---
 
-### GET `/v1/users/attributes`
+### GET `/*/users/attributes`
 
 Returns all the user's attributes in a JSON object.
 
@@ -232,7 +232,7 @@ Returns all the user's attributes in a JSON object.
 
 ---
 
-### DELETE  `/v1/users/attributes`
+### DELETE  `/*/users/attributes`
 
 Removes an attribute from a user.
 
@@ -266,7 +266,7 @@ Removes an attribute from a user.
 
 ---
 
-### POST `/v1/users/profile`
+### POST `/*/users/profile`
 
 Updates a user's `firstname` and `lastname` attributes.
 
@@ -301,7 +301,7 @@ Note: Any parameters that are not passed in will set the value of the user's pro
 
 ---
 
-### GET `/v1/users/profile`
+### GET `/*/users/profile`
 
 Returns data about the user appropriate for a profile.
 
@@ -329,7 +329,7 @@ Returns data about the user appropriate for a profile.
 
 ---
 
-### GET `/v1/users/status`
+### GET `/*/users/status`
 
 Returns a JSON representation of the current user. This endpoint does not return the user's attributes in the JSON response.
 
