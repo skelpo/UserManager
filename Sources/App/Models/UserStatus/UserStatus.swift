@@ -1,6 +1,6 @@
 import FluentMySQL
 
-struct UserStatus: RawRepresentable, Codable, Hashable {    
+struct UserStatus: RawRepresentable, Codable, Hashable, MySQLEnumType {
     static private(set) var statuses: [Int: String] = [
         0: "admin",
         1: "moderator",
@@ -53,22 +53,5 @@ extension UserStatus: ExpressibleByIntegerLiteral {
         } else {
             self.init(id: value, name: "custom-\(value)")
         }
-    }
-}
-
-extension UserStatus: MySQLColumnDefinitionStaticRepresentable, MySQLDataConvertible {
-    public static var mySQLColumnDefinition: MySQLColumnDefinition {
-        return .smallInt()
-    }
-    
-    public func convertToMySQLData() throws -> MySQLData {
-        return MySQLData.init(integer: self.id)
-    }
-    
-    public static func convertFromMySQLData(_ mysqlData: MySQLData) throws -> UserStatus {
-        guard let value = try mysqlData.integer(Int.self) else {
-            throw FluentError(identifier: "badTypeFetched", reason: "Attempted to retrive an Int, but received a different type", source: .capture())
-        }
-        return UserStatus(integerLiteral: value)
     }
 }
