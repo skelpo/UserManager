@@ -1,3 +1,4 @@
+import Authentication
 import JWTVapor
 import Fluent
 import Vapor
@@ -118,7 +119,7 @@ final class RouteRestrictionMiddleware: Middleware {
             // contained in the restrictions thatr match the request.
             guard
                 try passes.map({ $0.allowed }).joined().contains(payload.permissionLevel) ||
-                self.ids(from: Array(request.http.url.pathComponents.dropFirst()), matching: passes[0].path, for: User.self).contains(payload.id)
+                self.authedIDs(from: request, matching: Array(request.http.url.pathComponents.dropFirst()), and: passes[0].path, for: User.self).contains(payload.id)
             else {
                 throw Abort(self.failureError)
             }
@@ -166,9 +167,23 @@ final class RouteRestrictionMiddleware: Middleware {
         return true
     }
     
+    private func authedIDs<Parent>(from request: Request, matching path: [String], and components: [PathComponent], for userType: Parent.Type = Parent.self)throws -> [Parent.ID]
+        where Parent: Model & Parameter & Authenticatable, Parent.ID: LosslessStringConvertible
+    {
+        
+        // The all the parameter IDs, plus the ID of
+        // the authenticated user if there is one.
+        let ids = try self.ids(from: path, matching: components, for: Parent.self)
+        if let parent = try request.authenticated(Parent.self) {
+            return try ids + [parent.requireID()]
+        }
+        return ids
+    }
+    
     private func ids<Parent>(from path: [String], matching: [PathComponent], for userType: Parent.Type = Parent.self)throws -> [Parent.ID]
         where Parent: Model & Parameter, Parent.ID: LosslessStringConvertible
     {
+        
         // Get path componentns that are used as parameters.
         return try zip(path, matching).compactMap { components -> (slug: String, element: String)? in
             guard case let PathComponent.parameter(slug) = components.1 else { return nil }
