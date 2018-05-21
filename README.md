@@ -137,7 +137,7 @@ docker run -e JWT_SECRET='n-value-from-jwt' \
 -e DATABASE_USER='users_service' \
 -e DATABASE_PASSWORD='users_service' \
 -e DATABASE_DB='users_service' \
--e USER_JWT_D='d-value-from-jwt' users
+-e USER_JWT_D='d-value-from-jwt' -p 8080:8080 users
 ```
 
 If you want to run the server without docker the following summary of ENV variables that are needed may be helpful:
