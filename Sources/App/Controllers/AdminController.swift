@@ -40,8 +40,13 @@ final class AdminController: RouteCollection {
     /// Gets all user models with their attributes.
     func allUsers(_ request: Request)throws -> Future<AllUsersSuccessResponse> {
         
+        // Get optional lower and upper indexs for user range.
+        // If no valus are passed in, all users will be fetched.
+        let bottomIndex = try request.query.get(Int?.self, at: "bottomIndex") ?? 0
+        let upperIndex = try request.query.get(Int?.self, at: "upperIndex")
+        
         // Fetch all user models from the database.
-        return User.query(on: request).all().flatMap(to: [([Attribute], User)].self) { users in
+        return User.query(on: request).range(lower: bottomIndex, upper: upperIndex).all().flatMap(to: [([Attribute], User)].self) { users in
             
             // Get the attributes for each user, and connect them in a tuple.
             return try users.map { user in
