@@ -12,7 +12,7 @@ import JWT
 final class AuthController: RouteCollection {
     func boot(router: Router) throws {
         let auth = router.grouped(any, "users").grouped(
-            RouteRestrictionMiddleware(
+            RouteRestrictionMiddleware<UserStatus, Payload, User>(
                 restrictions: [
                     RouteRestriction(.POST, at: any, "users", "register", allowed: [.admin]),
                 ],

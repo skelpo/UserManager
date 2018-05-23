@@ -1,3 +1,4 @@
+import JWTMiddleware
 import Fluent
 import Vapor
 
@@ -18,7 +19,7 @@ final class UserController: RouteCollection {
     ///   register the routes with.
     func boot(router: Router) {
         let authenticated = router.grouped("users").grouped(
-            RouteRestrictionMiddleware(
+            RouteRestrictionMiddleware<UserStatus, Payload, User>(
                 restrictions: [
                     RouteRestriction(.POST, at: any, "users", "profile", allowed: [.admin]),
                     ],
