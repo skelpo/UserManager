@@ -22,7 +22,8 @@ final class UserController: RouteCollection {
             RouteRestrictionMiddleware<UserStatus, Payload, User>(
                 restrictions: [
                     RouteRestriction(.POST, at: any, "users", "profile", allowed: [.admin]),
-                    ],
+                    RouteRestriction(.POST, at: any, "users", "attributes", allowed: [.admin])
+                ],
                 parameters: [User.routingSlug: User.resolveParameter]
             )
         )
