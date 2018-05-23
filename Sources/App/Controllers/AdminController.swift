@@ -1,11 +1,22 @@
+import JWTMiddleware
 import FluentMySQL
 import Vapor
 
 final class AdminController: RouteCollection {
     func boot(router: Router) throws {
-        router.get("users", use: allUsers)
-        router.patch(UserUpdate.self, at: "users", User.parameter, use: editUser)
-        router.patch(AttributeUpdate.self, at: "attributes", Attribute.parameter, use: editAttribute)
+        let admin = router.grouped(
+            RouteRestrictionMiddleware<UserStatus, Payload, User>(
+                restrictions: [
+                    RouteRestriction.init(.GET, at: "users", allowed: [.admin]),
+                    RouteRestriction.init(.PATCH, at: "users", User.parameter, allowed: [.admin]),
+                    RouteRestriction.init(.PATCH, at: "attributes", Attribute.parameter, allowed: [.admin])
+                ],
+                parameters: [User.routingSlug: User.resolveParameter, Attribute.routingSlug: Attribute.resolveParameter])
+        )
+        
+        admin.get("users", use: allUsers)
+        admin.patch(UserUpdate.self, at: "users", User.parameter, use: editUser)
+        admin.patch(AttributeUpdate.self, at: "attributes", Attribute.parameter, use: editAttribute)
     }
     
     func allUsers(_ request: Request)throws -> Future<AllUsersSuccessResponse> {
