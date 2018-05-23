@@ -18,22 +18,11 @@ final class UserController: RouteCollection {
     /// - Parameter router: The router to
     ///   register the routes with.
     func boot(router: Router) {
-        let authenticated = router.grouped("users").grouped(
-            RouteRestrictionMiddleware<UserStatus, Payload, User>(
-                restrictions: [
-                    RouteRestriction(.POST, at: any, "users", "profile", allowed: [.admin]),
-                    RouteRestriction(.POST, at: any, "users", "attributes", allowed: [.admin]),
-                    RouteRestriction(.GET, at: any, "users", "profile", allowed: [.admin])
-                ],
-                parameters: [User.routingSlug: User.resolveParameter]
-            )
-        )
-        
-        authenticated.get("profile", use: profile)
-        authenticated.post(NewUserBody.self, at: "profile", use: save)
-        authenticated.get("attributes", use: attributes)
-        authenticated.post(AttributeBody.self, at: "attributes", use: createAttribute)
-        authenticated.delete("attribute", use: deleteAttributes)
+        router.get("profile", use: profile)
+        router.post(NewUserBody.self, at: "profile", use: save)
+        router.get("attributes", use: attributes)
+        router.post(AttributeBody.self, at: "attributes", use: createAttribute)
+        router.delete("attribute", use: deleteAttributes)
         
         router.delete("users", User.parameter, use: delete)
     }
