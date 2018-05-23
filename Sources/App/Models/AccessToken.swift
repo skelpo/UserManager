@@ -7,8 +7,8 @@ import JWT
 
 /// A representation of the payload used in the access tokens
 /// for this service's authentication.
-struct Payload: IdentifiableJWTPayload {
-    let permissionLevel: UserStatus
+struct Payload: PermissionedUserPayload {
+    let status: UserStatus
     let firstname: String?
     let lastname: String?
     let language: String
@@ -20,7 +20,7 @@ struct Payload: IdentifiableJWTPayload {
     init(user: User, expiration: TimeInterval = 3600)throws {
         let now = Date().timeIntervalSince1970
         
-        self.permissionLevel = user.permissionLevel
+        self.status = user.permissionLevel
         self.firstname = user.firstname
         self.lastname = user.lastname
         self.language = user.language
