@@ -3,10 +3,9 @@ import Vapor
 
 final class AdminController: RouteCollection {
     func boot(router: Router) throws {
-        let users = router.grouped("users")
-        
-        users.get(use: allUsers)
-        users.patch(UserUpdate.self, at: User.parameter, use: editUser)
+        router.get("users", use: allUsers)
+        router.patch(UserUpdate.self, at: "users", User.parameter, use: editUser)
+        router.patch(AttributeUpdate.self, at: "attributes", Attribute.parameter, use: editAttribute)
     }
     
     func allUsers(_ request: Request)throws -> Future<AllUsersSuccessResponse> {
@@ -33,6 +32,14 @@ final class AdminController: RouteCollection {
             return user.update(on: request)
         }.response(on: request, forProfile: true)
     }
+    
+    func editAttribute(_ request: Request, _ body: AttributeUpdate)throws -> Future<Attribute> {
+        let attribute = try request.parameters.next(Attribute.self)
+        return attribute.flatMap(to: Attribute.self) { attribute in
+            attribute.text = body.value ?? attribute.text
+            return attribute.update(on: request)
+        }
+    }
 }
 
 struct AllUsersSuccessResponse: Content {
@@ -41,10 +48,14 @@ struct AllUsersSuccessResponse: Content {
 }
 
 struct UserUpdate: Content {
-    var firstname: String?
-    var lastname: String?
-    var email: String?
-    var language: String?
-    var confirmed: Bool?
-    var permissionLevel: UserStatus?
+    let firstname: String?
+    let lastname: String?
+    let email: String?
+    let language: String?
+    let confirmed: Bool?
+    let permissionLevel: UserStatus?
+}
+
+struct AttributeUpdate: Content {
+    let value: String?
 }

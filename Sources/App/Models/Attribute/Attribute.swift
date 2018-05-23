@@ -2,7 +2,7 @@ import FluentMySQL
 import Vapor
 
 /// An attribute for a `User` to store custom data..
-final class Attribute: Content, MySQLModel, Migration {
+final class Attribute: Content, MySQLModel, Migration, Parameter {
     
     /// The database ID of a class instance.
     var id: Int?
