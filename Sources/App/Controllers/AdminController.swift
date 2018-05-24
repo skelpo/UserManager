@@ -20,7 +20,9 @@ final class AdminController: RouteCollection {
                     RouteRestriction.init(.PATCH, at: "users", User.parameter, allowed: [.admin]),
                     RouteRestriction.init(.PATCH, at: "attributes", Attribute.parameter, allowed: [.admin])
                 ],
-                parameters: [User.routingSlug: User.resolveParameter, Attribute.routingSlug: Attribute.resolveParameter])
+                parameters: [User.routingSlug: User.resolveParameter, Attribute.routingSlug: Attribute.resolveParameter]
+            ),
+            JWTVerificationMiddleware()
         )
         
         // Register handlers with route paths.
