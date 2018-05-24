@@ -93,8 +93,6 @@ public func configure(
     let emailURL = Environment.get("EMAIL_URL") ?? "http://localhost:8080/v1/users/activate"
     emailConfirmation = Environment.get("EMAIL_CONFIRMATION")=="on"
     
-    print("email confirmation:", emailConfirmation)
-    
     /// Register the `AppConfig` service,
     /// used to store arbitrary data.
     services.register(AppConfig(emailURL: emailURL, emailFrom: emailFrom))
