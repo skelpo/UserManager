@@ -24,10 +24,13 @@ final class AuthController: RouteCollection {
         auth.post(User.self, at: "register", use: register)
         auth.post("newPassword", use: newPassword)
         auth.post("accessToken", use: refreshAccessToken)
-        auth.get("activate", use: activate)
         
         protected.post("login", use: login)
         protected.get("status", use: status)
+        
+        if emailConfirmation {
+            auth.get("activate", use: activate)
+        }
     }
     
     /// Creates a new `User` model in the database.
