@@ -9,8 +9,13 @@ import Vapor
 
 /// Used to check wheather we should send a confirmation email when a user creates an account,
 /// or if they should be auto-confirmed.
-/// Note: This variable is set through the environment variable "EMAIL_CONFIRMATION" and "on/off" as values.
+/// - Note: This variable is set through the environment variable "EMAIL_CONFIRMATION" and "on/off" as values.
 var emailConfirmation: Bool = true
+
+/// The configuration key for wheather user registration is open to the public
+/// or must be executed by an admin user.
+/// - Note: This variable can be set through the environment variable "OPEN_REGISTRATION" and "on/off" as values.
+var openRegistration: Bool = false
 
 /// Called before your application initializes.
 ///
@@ -91,7 +96,9 @@ public func configure(
     
     let emailFrom = Environment.get("EMAIL_FROM") ?? "info@skelpo.com"
     let emailURL = Environment.get("EMAIL_URL") ?? "http://localhost:8080/v1/users/activate"
+    
     emailConfirmation = Environment.get("EMAIL_CONFIRMATION")=="on"
+    openRegistration = Environment.get("OPEN_REGISTRATION")=="off"
     
     /// Register the `AppConfig` service,
     /// used to store arbitrary data.

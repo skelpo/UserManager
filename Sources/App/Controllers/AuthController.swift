@@ -11,7 +11,7 @@ import JWT
 /// A route controller that handles user authentication with JWT.
 final class AuthController: RouteCollection {
     func boot(router: Router) throws {
-        let restrictions = emailConfirmation ? [] : [RouteRestriction<UserStatus>(.POST, at: any, "users", "register", allowed: [.admin])]
+        let restrictions = openRegistration ? [] : [RouteRestriction<UserStatus>(.POST, at: any, "users", "register", allowed: [.admin])]
         
         let auth = router.grouped(any, "users").grouped(
             RouteRestrictionMiddleware<UserStatus, Payload, User>(
