@@ -92,9 +92,7 @@ final class UserController: RouteCollection {
         
         // Delete all the `Attribute` models connected to
         // the user, then delete the user.
-        return user.flatMap(to: User.self) { user in
-            return try user.attributes(on: request).delete().transform(to: user)
-        }.flatMap(to: HTTPStatus.self) { user in
+        return try user.attributes(on: request).delete().transform(to: user).flatMap(to: HTTPStatus.self) { user in
             return user.delete(on: request).transform(to: .noContent)
         }
     }

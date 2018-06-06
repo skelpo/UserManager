@@ -51,7 +51,7 @@ public func configure(
     var middlewares = MiddlewareConfig() // Create _empty_ middleware config
     middlewares.use(CORSMiddleware()) // Adds Cross-Origin referance headers to reponses where the request had an 'Origin' header.
     middlewares.use(ErrorMiddleware.self) // Catches errors and converts to HTTP response
-    middlewares.use(APIErrorMiddleware(specializations: [ // Catches all errors and formats them in a JSON response.
+    middlewares.use(APIErrorMiddleware(environment: env, specializations: [ // Catches all errors and formats them in a JSON response.
         ModelNotFound(),
         DecodingTypeMismatch()
     ]))
