@@ -17,7 +17,7 @@ final class AdminController: RouteCollection {
             RouteRestrictionMiddleware<UserStatus, Payload, User>(
                 restrictions: [
                     RouteRestriction.init(.GET, at: "users", allowed: [.admin]),
-                    RouteRestriction.init(.PATCH, at: "users", User.parameter, allowed: [.admin]),
+                    RouteRestriction.init(at: "users", User.parameter, allowed: [.admin]),
                     RouteRestriction.init(.PATCH, at: "attributes", Attribute.parameter, allowed: [.admin])
                 ],
                 parameters: [User.routingSlug: User.resolveParameter, Attribute.routingSlug: Attribute.resolveParameter]
@@ -34,6 +34,9 @@ final class AdminController: RouteCollection {
         
         // `self.editUser` to `PATCH /*/users/:user`.
         admin.patch(UserUpdate.self, at: any, "users", User.parameter, use: editUser)
+        
+        // `self.deleteUser` to `DELETE /*/users/:user`.
+        admin.delete(any, "users", User.parameter, use: deleteUser)
         
         // `self.editAttribute` to `PATCH /*/attributes/:attribute`.
         admin.patch(AttributeUpdate.self, at: any, "attributes", Attribute.parameter, use: editAttribute)
@@ -83,6 +86,20 @@ final class AdminController: RouteCollection {
             // Save the updated user to the database and convert it to a `UserResponse`.
             return user.update(on: request)
         }.response(on: request, forProfile: true)
+    }
+    
+    func deleteUser(_ request: Request)throws -> Future<HTTPStatus> {
+        
+        // Get the user from request parameter to delete.
+        return try request.parameters.next(User.self).flatMap { user in
+            
+            // Delete the user attributes before the user itself.
+            return try user.attributes(on: request).delete().transform(to: user)
+        }.flatMap { user in
+            
+            // Delete the user and return the 204 (No Content) HTTP status.
+            return user.delete(on: request).transform(to: .noContent)
+        }
     }
     
     /// Updates an attribute's value in the database with a given ID.
