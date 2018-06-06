@@ -19,12 +19,13 @@ final class UserController: RouteCollection {
     ///   register the routes with.
     func boot(router: Router) {
         router.get("profile", use: profile)
-        router.post(NewUserBody.self, at: "profile", use: save)
         router.get("attributes", use: attributes)
-        router.post(AttributeBody.self, at: "attributes", use: createAttribute)
-        router.delete("attribute", use: deleteAttributes)
         
-        router.delete("users", User.parameter, use: delete)
+        router.post(NewUserBody.self, at: "profile", use: save)
+        router.post(AttributeBody.self, at: "attributes", use: createAttribute)
+        
+        router.delete("attribute", use: deleteAttributes)
+        router.delete("user", use: delete)
     }
     
     /// Gets the profile data for the authenticated user.
@@ -82,19 +83,15 @@ final class UserController: RouteCollection {
     /// The authed user that is deleting the other user must be an admin.
     func delete(_ request: Request)throws -> Future<HTTPStatus> {
         
-        // Get the authenticated user and verify they are an admin
-        let admin = try request.user()
-        guard admin.permissionLevel == .admin else {
-            throw Abort(.unauthorized, reason: "Only admins can delete users.")
-        }
-        
-        // Get the user to delete.
-        let user = try request.parameters.next(User.self)
+        // Get the authenticated user.
+        let user = try request.user()
         
         // Delete all the `Attribute` models connected to
         // the user, then delete the user.
-        return user.flatMap(to: HTTPStatus.self) { user in
-            return try user.attributes(on: request).delete().transform(to: .noContent)
+        return user.flatMap(to: User.self) { user in
+            return try user.attributes(on: request).delete().transform(to: user)
+        }.flatMap(to: HTTPStatus.self) { user in
+            return user.delete(on: request).transform(to: .noContent)
         }
     }
     
