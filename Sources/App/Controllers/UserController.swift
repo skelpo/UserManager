@@ -28,6 +28,10 @@ final class UserController: RouteCollection {
         router.delete("user", use: delete)
     }
     
+    func allData(_ request: Request)throws -> ResponseEncodable {
+        fatalError()
+    }
+    
     /// Gets the profile data for the authenticated user.
     /// The requeat passed in should be sent through the
     ///
