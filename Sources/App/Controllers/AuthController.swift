@@ -35,6 +35,8 @@ final class AuthController: RouteCollection {
     
     /// Creates a new `User` model in the database.
     func register(_ request: Request, _ user: User)throws -> Future<UserSuccessResponse> {
+        // Validate the properties of the new user model using custom validations.
+        try user.validate()
         
         // Make sure no user exists yet with the email pssed in.
         let count = try User.query(on: request).filter(\.email == user.email).count()
