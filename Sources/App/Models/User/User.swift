@@ -7,6 +7,7 @@
 //
 
 import FluentMySQL
+import Validation
 import Crypto
 import Vapor
 
@@ -102,5 +103,14 @@ extension User: SoftDeletable {
     /// Allows Fluent to set the `deletedAt` property to the value stored in the database.
     static var deletedAtKey: WritableKeyPath<User, Date?> {
         return \.deletedAt
+    }
+}
+
+extension User: Validatable {
+    static func validations() throws -> Validations<User> {
+        var validations = Validations(User.self)
+        try validations.add(\.password, .ascii && .count(6...))
+        try validations.add(\.email, .email)
+        return validations
     }
 }
