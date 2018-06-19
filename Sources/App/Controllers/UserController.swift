@@ -28,10 +28,6 @@ final class UserController: RouteCollection {
         router.delete("user", use: delete)
     }
     
-    func allData(_ request: Request)throws -> ResponseEncodable {
-        fatalError()
-    }
-    
     /// Gets the profile data for the authenticated user.
     /// The requeat passed in should be sent through the
     ///
@@ -71,7 +67,7 @@ final class UserController: RouteCollection {
         // Get the attribute with the matching key.
         // If one exists, update its `text` property,
         // otherwise create a new one.
-        return try Attribute.query(on: request).filter(\.key == content.attributeKey).first().flatMap(to: Attribute.self) { attribute in
+        return Attribute.query(on: request).filter(\.key == content.attributeKey).first().flatMap(to: Attribute.self) { attribute in
             if let attribute = attribute {
                 attribute.text = content.attributeText
                 return attribute.save(on: request)

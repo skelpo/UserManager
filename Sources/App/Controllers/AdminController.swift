@@ -83,6 +83,9 @@ final class AdminController: RouteCollection {
             user.confirmed = body.confirmed ?? user.confirmed
             user.permissionLevel = body.permissionLevel ?? user.permissionLevel
             
+            // Verify the updated property values of the user.
+            try user.validate()
+            
             // Save the updated user to the database and convert it to a `UserResponse`.
             return user.update(on: request)
         }.response(on: request, forProfile: true)

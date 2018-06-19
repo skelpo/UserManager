@@ -34,7 +34,7 @@ extension Attribute {
     static func prepare(on connection: MySQLDatabase.Connection) -> Future<Void> {
         return Database.create(self, on: connection) { builder in
             try addProperties(to: builder)
-            try builder.addReference(from: \.userID, to: \User.id)
+            builder.reference(from: \.userID, to: \User.id)
         }
     }
 }

@@ -2,9 +2,9 @@ import Fluent
 
 extension User {
     /// Create a query that gets all the attributes belonging to a user.
-    func attributes(on connection: DatabaseConnectable)throws -> QueryBuilder<Attribute, Attribute> {
+    func attributes(on connection: DatabaseConnectable)throws -> QueryBuilder<Attribute.Database, Attribute> {
         // Return an `Attribute` query that filters on the `userId` field.
-        return try Attribute.query(on: connection).filter(\.userID == self.id)
+        return try Attribute.query(on: connection).filter(\.userID == self.requireID())
     }
     
     /// Creates a dictionary where the key is the attribute's key and the value is the attribute's text.
