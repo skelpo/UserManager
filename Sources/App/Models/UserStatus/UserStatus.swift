@@ -77,6 +77,10 @@ struct UserStatus: RawRepresentable, Codable, Hashable, MySQLEnumType {
         var container = encoder.singleValueContainer()
         try container.encode(id)
     }
+    
+    static func reflectDecoded() throws -> (UserStatus, UserStatus) {
+        return (.admin, .standard)
+    }
 }
 
 extension UserStatus: ExpressibleByIntegerLiteral {
