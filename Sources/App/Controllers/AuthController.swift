@@ -39,7 +39,7 @@ final class AuthController: RouteCollection {
         try user.validate()
         
         // Make sure no user exists yet with the email pssed in.
-        let count = try User.query(on: request).filter(\.email == user.email).count()
+        let count = User.query(on: request).filter(\.email == user.email).count()
         return count.map(to: User.self) { count in
             guard count < 1 else { throw Abort(.badRequest, reason: "This email is already registered.") }
             return user
@@ -99,7 +99,7 @@ final class AuthController: RouteCollection {
         let email = try request.content.syncGet(String.self, at: "email")
         
         // Verify a user exists with the given email.
-        let user = try User.query(on: request).filter(\.email == email).first().unwrap(or: Abort(.badRequest, reason: "No user found with email '\(email)'."))
+        let user = User.query(on: request).filter(\.email == email).first().unwrap(or: Abort(.badRequest, reason: "No user found with email '\(email)'."))
         return user.flatMap(to: (User, String).self) { user in
             
             // Verifiy that the user has confimed their account.
@@ -144,7 +144,7 @@ final class AuthController: RouteCollection {
         
         // Get the user with the ID that was just fetched.
         let userID = refreshJWT.payload.id
-        let user = try User.find(userID, on: request).unwrap(or: Abort(.badRequest, reason: "No user found with ID '\(userID)'."))
+        let user = User.find(userID, on: request).unwrap(or: Abort(.badRequest, reason: "No user found with ID '\(userID)'."))
         
         return user.flatMap(to: (JSON, Payload).self) { user in
             
@@ -167,7 +167,7 @@ final class AuthController: RouteCollection {
         
         // Get the user from the database with the email code from the request.
         let code = try request.query.get(String.self, at: "code")
-        let user = try User.query(on: request).filter(\.emailCode == code).first().unwrap(or: Abort(.badRequest, reason: "No user found with the given code."))
+        let user = User.query(on: request).filter(\.emailCode == code).first().unwrap(or: Abort(.badRequest, reason: "No user found with the given code."))
         
         return user.flatMap(to: User.self) { user in
             guard !user.confirmed else { throw Abort(.badRequest, reason: "User already activated.") }

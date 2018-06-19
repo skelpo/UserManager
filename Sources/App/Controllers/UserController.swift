@@ -67,7 +67,7 @@ final class UserController: RouteCollection {
         // Get the attribute with the matching key.
         // If one exists, update its `text` property,
         // otherwise create a new one.
-        return try Attribute.query(on: request).filter(\.key == content.attributeKey).first().flatMap(to: Attribute.self) { attribute in
+        return Attribute.query(on: request).filter(\.key == content.attributeKey).first().flatMap(to: Attribute.self) { attribute in
             if let attribute = attribute {
                 attribute.text = content.attributeText
                 return attribute.save(on: request)
