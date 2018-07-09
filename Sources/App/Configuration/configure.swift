@@ -67,8 +67,7 @@ public func configure(
     else {
         throw MySQLError(
             identifier: "missingEnvVars",
-            reason: "One or more expected environment variables are missing: DATABASE_HOSTNAME, DATABASE_USER, DATABASE_DB",
-            source: .capture()
+            reason: "One or more expected environment variables are missing: DATABASE_HOSTNAME, DATABASE_USER, DATABASE_DB"
         )
     }
     let config = MySQLDatabaseConfig(
@@ -84,8 +83,8 @@ public func configure(
     
     /// Configure migrations
     var migrations = MigrationConfig()
-    migrations.add(model: Attribute.self, database: .mysql)
     migrations.add(model: User.self, database: .mysql)
+    migrations.add(model: Attribute.self, database: .mysql)
     services.register(migrations)
     
     let jwt = JWTDataConfig()
