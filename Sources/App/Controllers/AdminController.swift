@@ -14,14 +14,7 @@ final class AdminController: RouteCollection {
         // Create a route-group that only allows
         // admin users to access the endpoint.
         let admin = router.grouped(
-            RouteRestrictionMiddleware<UserStatus, Payload, User>(
-                restrictions: [
-                    RouteRestriction.init(.GET, at: "users", allowed: [.admin]),
-                    RouteRestriction.init(at: "users", User.parameter, allowed: [.admin]),
-                    RouteRestriction.init(.PATCH, at: "attributes", Attribute.parameter, allowed: [.admin])
-                ],
-                parameters: [User.routingSlug: User.resolveParameter, Attribute.routingSlug: Attribute.resolveParameter]
-            ),
+            PermissionsMiddleware<UserStatus, Payload>(allowed: [.admin]),
             JWTVerificationMiddleware()
         )
         

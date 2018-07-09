@@ -67,8 +67,7 @@ public func configure(
     else {
         throw MySQLError(
             identifier: "missingEnvVars",
-            reason: "One or more expected environment variables are missing: DATABASE_HOSTNAME, DATABASE_USER, DATABASE_DB",
-            source: .capture()
+            reason: "One or more expected environment variables are missing: DATABASE_HOSTNAME, DATABASE_USER, DATABASE_DB"
         )
     }
     let config = MySQLDatabaseConfig(
