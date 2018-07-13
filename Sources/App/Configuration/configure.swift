@@ -25,10 +25,8 @@ public func configure(
     _ env: inout Environment,
     _ services: inout Services
 ) throws {
-    let jwtProvider = JWTProvider { n in
-        guard let d = Environment.get("USER_JWT_D") else {
-            throw Abort(.internalServerError, reason: "Could not find environment variable 'USER_JWT_D'", identifier: "missingEnvVar")
-        }
+    let jwtProvider = JWTProvider { n, d in
+        guard let d = d else { throw Abort(.internalServerError, reason: "Could not find environment variable 'JWT_SECRET'", identifier: "missingEnvVar") }
         
         let headers = JWTHeader(alg: "RS256", crit: ["exp", "aud"], kid: "user_manager_kid")
         return try RSAService(n: n, e: "AQAB", d: d, header: headers)
