@@ -9,8 +9,13 @@ import Vapor
 
 /// Used to check wheather we should send a confirmation email when a user creates an account,
 /// or if they should be auto-confirmed.
-/// Note: This variable is set through the environment variable "EMAIL_CONFIRMATION" and "on/off" as values.
+/// - Note: This variable is set through the environment variable "EMAIL_CONFIRMATION" and "on/off" as values.
 var emailConfirmation: Bool = true
+
+/// The configuration key for wheather user registration is open to the public
+/// or must be executed by an admin user.
+/// - Note: This variable can be set through the environment variable "OPEN_REGISTRATION" and "on/off" as values.
+var openRegistration: Bool = false
 
 /// Called before your application initializes.
 ///
@@ -20,10 +25,8 @@ public func configure(
     _ env: inout Environment,
     _ services: inout Services
 ) throws {
-    let jwtProvider = JWTProvider { n in
-        guard let d = Environment.get("USER_JWT_D") else {
-            throw Abort(.internalServerError, reason: "Could not find environment variable 'USER_JWT_D'", identifier: "missingEnvVar")
-        }
+    let jwtProvider = JWTProvider { n, d in
+        guard let d = d else { throw Abort(.internalServerError, reason: "Could not find environment variable 'JWT_SECRET'", identifier: "missingEnvVar") }
         
         let headers = JWTHeader(alg: "RS256", crit: ["exp", "aud"], kid: "user_manager_kid")
         return try RSAService(n: n, e: "AQAB", d: d, header: headers)
@@ -38,15 +41,17 @@ public func configure(
     try services.register(jwtProvider)
     
     /// Register routes to the router
-    let router = EngineRouter.default()
-    try routes(router)
-    services.register(router, as: Router.self)
+    services.register(Router.self) { container -> EngineRouter in
+        let router = EngineRouter.default()
+        try routes(router, container)
+        return router
+    }
     
     /// Register middleware
     var middlewares = MiddlewareConfig() // Create _empty_ middleware config
     middlewares.use(CORSMiddleware()) // Adds Cross-Origin referance headers to reponses where the request had an 'Origin' header.
     middlewares.use(ErrorMiddleware.self) // Catches errors and converts to HTTP response
-    middlewares.use(APIErrorMiddleware(specializations: [ // Catches all errors and formats them in a JSON response.
+    middlewares.use(APIErrorMiddleware(environment: env, specializations: [ // Catches all errors and formats them in a JSON response.
         ModelNotFound(),
         DecodingTypeMismatch()
     ]))
@@ -62,8 +67,7 @@ public func configure(
     else {
         throw MySQLError(
             identifier: "missingEnvVars",
-            reason: "One or more expected environment variables are missing: DATABASE_HOSTNAME, DATABASE_USER, DATABASE_DB",
-            source: .capture()
+            reason: "One or more expected environment variables are missing: DATABASE_HOSTNAME, DATABASE_USER, DATABASE_DB"
         )
     }
     let config = MySQLDatabaseConfig(
@@ -79,8 +83,8 @@ public func configure(
     
     /// Configure migrations
     var migrations = MigrationConfig()
-    migrations.add(model: Attribute.self, database: .mysql)
     migrations.add(model: User.self, database: .mysql)
+    migrations.add(model: Attribute.self, database: .mysql)
     services.register(migrations)
     
     let jwt = JWTDataConfig()
@@ -91,7 +95,9 @@ public func configure(
     
     let emailFrom = Environment.get("EMAIL_FROM") ?? "info@skelpo.com"
     let emailURL = Environment.get("EMAIL_URL") ?? "http://localhost:8080/v1/users/activate"
+    
     emailConfirmation = Environment.get("EMAIL_CONFIRMATION")=="on"
+    openRegistration = Environment.get("OPEN_REGISTRATION")=="off"
     
     /// Register the `AppConfig` service,
     /// used to store arbitrary data.

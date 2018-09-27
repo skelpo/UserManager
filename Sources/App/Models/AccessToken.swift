@@ -30,9 +30,9 @@ struct Payload: PermissionedUserPayload {
         self.id = try user.requireID()
     }
     
-    func verify() throws {
+    func verify(using signer: JWTSigner) throws {
         let expiration = Date(timeIntervalSince1970: self.exp)
-        try ExpirationClaim(value: expiration).verify()
+        try ExpirationClaim(value: expiration).verifyNotExpired()
     }
 }
 
@@ -50,14 +50,14 @@ struct RefreshToken: IdentifiableJWTPayload {
         self.exp = now + expiration
     }
     
-    func verify() throws {
+    func verify(using signer: JWTSigner) throws {
         let expiration = Date(timeIntervalSince1970: self.exp)
-        try ExpirationClaim(value: expiration).verify()
+        try ExpirationClaim(value: expiration).verifyNotExpired()
     }
 }
 
 extension JSON: JWTPayload {
-    public func verify() throws {
+    public func verify(using signer: JWTSigner) throws {
         // Don't do anything
         // We only conform to `JWTPayload`
         // so we can sign a JWT with JSON as

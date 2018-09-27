@@ -3,6 +3,7 @@ import Vapor
 
 /// An attribute for a `User` to store custom data..
 final class Attribute: Content, MySQLModel, Migration, Parameter {
+    static let entity: String = "attributes"
     
     /// The database ID of a class instance.
     var id: Int?
@@ -27,5 +28,14 @@ final class Attribute: Content, MySQLModel, Migration, Parameter {
         self.text = text
         self.userID = userID
         self.key = key
+    }
+}
+
+extension Attribute {
+    static func prepare(on connection: MySQLDatabase.Connection) -> Future<Void> {
+        return Database.create(self, on: connection) { builder in
+            try addProperties(to: builder)
+            builder.reference(from: \.userID, to: \User.id)
+        }
     }
 }

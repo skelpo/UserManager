@@ -7,11 +7,13 @@
 //
 
 import FluentMySQL
+import Validation
 import Crypto
 import Vapor
 
 /// A generic user that can be conected to any service that uses JWT for authentication.
 final class User: Content, MySQLModel, Migration, Parameter {
+    static let entity: String = "users"
     
     /// The database ID of the class instance.
     var id: Int?
@@ -92,15 +94,20 @@ final class User: Content, MySQLModel, Migration, Parameter {
         self.permissionLevel = try container.decodeIfPresent(UserStatus.self, forKey: .permissionLevel) ?? .standard
         self.deletedAt = try container.decodeIfPresent(Date.self, forKey: .deletedAt)
     }
-}
-
-/// Conforms the `User` model to the `SoftDeletable` protocol.
-/// Allows a `users` row to be temporarily deleted from the database
-/// with the possibility to restore.
-extension User: SoftDeletable {
     
     /// Allows Fluent to set the `deletedAt` property to the value stored in the database.
-    static var deletedAtKey: WritableKeyPath<User, Date?> {
+    /// Allows a `users` row to be temporarily deleted from the database
+    /// with the possibility to restore.
+    static var deletedAtKey: WritableKeyPath<User, Date?>? {
         return \.deletedAt
+    }
+}
+
+extension User: Validatable {
+    static func validations() throws -> Validations<User> {
+        var validations = Validations(User.self)
+        try validations.add(\.password, .ascii && .count(6...))
+        try validations.add(\.email, .email)
+        return validations
     }
 }
