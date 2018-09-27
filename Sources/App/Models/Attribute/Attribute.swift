@@ -3,6 +3,7 @@ import Vapor
 
 /// An attribute for a `User` to store custom data..
 final class Attribute: Content, MySQLModel, Migration, Parameter {
+    static let entity: String = "attributes"
     
     /// The database ID of a class instance.
     var id: Int?

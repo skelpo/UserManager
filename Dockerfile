@@ -1,4 +1,4 @@
-FROM swift:4.1
+FROM swift:4.2
 
 ARG ENVIRONMENT
 ENV ENVIRONMENT ${ENVIRONMENT:-production}
