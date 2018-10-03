@@ -136,7 +136,7 @@ final class AuthController: RouteCollection {
         // Get refresh token from request body and verify it.
         let refreshToken = try request.content.syncGet(String.self, at: "refreshToken")
         let refreshJWT = try JWT<RefreshToken>(from: refreshToken, verifiedUsing: signer.signer)
-        try refreshJWT.payload.verify()
+        try refreshJWT.payload.verify(using: signer.signer)
         
         // Get the user with the ID that was just fetched.
         let userID = refreshJWT.payload.id
