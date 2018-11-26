@@ -30,7 +30,7 @@ extension User: BasicJWTAuthenticatable {
     
     /// The key-path for the property to check against `AuthBody.username`
     /// when fetching the user form the database to authenticate.
-    static var usernameKey: KeyPath<User, String> {
+    static var usernameKey: WritableKeyPath<User, String> {
         return \.email
     }
     
