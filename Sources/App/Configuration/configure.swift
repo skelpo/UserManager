@@ -41,9 +41,11 @@ public func configure(
     try services.register(jwtProvider)
     
     /// Register routes to the router
-    let router = EngineRouter.default()
-    try routes(router)
-    services.register(router, as: Router.self)
+    services.register(Router.self) { container -> EngineRouter in
+        let router = EngineRouter.default()
+        try routes(router, container)
+        return router
+    }
     
     /// Register middleware
     var middlewares = MiddlewareConfig() // Create _empty_ middleware config

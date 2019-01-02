@@ -10,6 +10,12 @@ import JWT
 
 /// A route controller that handles user authentication with JWT.
 final class AuthController: RouteCollection {
+    private let jwtService:JWTService
+    
+    init(jwtService: JWTService) {
+        self.jwtService = jwtService
+    }
+    
     func boot(router: Router) throws {
         
         let auth = router.grouped(any, "users")
@@ -131,13 +137,11 @@ final class AuthController: RouteCollection {
     
     /// A route handler that returns a new access and refresh token for the user.
     func refreshAccessToken(_ request: Request)throws -> Future<[String: String]> {
-        let signer = try request.make(JWTService.self)
-        
         // Get refresh token from request body and verify it.
         let refreshToken = try request.content.syncGet(String.self, at: "refreshToken")
         let refreshJWT = try JWT<RefreshToken>(from: refreshToken, verifiedUsing: signer.signer)
         try refreshJWT.payload.verify(using: signer.signer)
-        
+
         // Get the user with the ID that was just fetched.
         let userID = refreshJWT.payload.id
         let user = User.find(userID, on: request).unwrap(or: Abort(.badRequest, reason: "No user found with ID '\(userID)'."))
@@ -148,12 +152,12 @@ final class AuthController: RouteCollection {
             
             // Construct the new access token payload
             let payload = try App.Payload(user: user)
-            return try request.payloadData(signer.sign(payload), with: ["userId": "\(user.requireID())"], as: JSON.self).and(result: payload)
+            return try request.payloadData(self.jwtService.sign(payload), with: ["userId": "\(user.requireID())"], as: JSON.self).and(result: payload)
         }.map(to: [String: String].self) { payloadData in
             let payload = try payloadData.0.merge(payloadData.1.json())
             
             // Return the signed token with a success status.
-            let token = try signer.sign(payload)
+            let token = try self.jwtService.sign(payload)
             return ["status": "success", "accessToken": token]
         }
     }
@@ -179,15 +183,13 @@ final class AuthController: RouteCollection {
     /// The actual authentication is handled by the `JWTAuthenticatableMiddleware`.
     /// The request's body should contain an email and a password for authenticating.
     func login(_ request: Request)throws -> Future<LoginResponse> {
-        let signer = try request.make(JWTService.self)
-        
         let user = try request.requireAuthenticated(User.self)
         let userPayload = try Payload(user: user)
         
         // Create a payload using the standard data
         // and the data from the registered `DataService`s
         let remotePayload = try request.payloadData(
-            signer.sign(userPayload),
+            self.jwtService.sign(userPayload),
             with: ["userId": "\(user.requireID())"],
             as: JSON.self
         )
@@ -196,8 +198,8 @@ final class AuthController: RouteCollection {
         return remotePayload.map(to: LoginResponse.self) { remotePayload in
             let payload = try remotePayload.merge(userPayload.json())
             
-            let accessToken = try signer.sign(payload)
-            let refreshToken = try signer.sign(RefreshToken(user: user))
+            let accessToken = try self.jwtService.sign(payload)
+            let refreshToken = try self.jwtService.sign(RefreshToken(user: user))
             
             guard user.confirmed else { throw Abort(.badRequest, reason: "User not activated.") }
             

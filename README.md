@@ -41,7 +41,7 @@ The names of the environment variables are the same ones used by Vapor Cloud, so
 
 ### JWT
 
-You will also need to create an environment variable named `JWT_SECRET` with the `n` value of the JWK to verify access tokens. This service also signs the access tokens, so you will need another environment variable (called `USER_JWT_D` by default, but that can be changed) that contains the `d` value of the JWK.
+You will also need to create an environment variable named `JWT_PUBLIC` with the `n` value of the JWK to verify access tokens. This service also signs the access tokens, so you will need another environment variable (called `JWT_SECRET` by default, but that can be changed) that contains the `d` value of the JWK.
 
 ### Email
 
@@ -132,22 +132,22 @@ The easiest way to start the service is by using the Dockerfile. The following c
 ```bash
 # Note that you still need to setup the database before this step.
 docker build . -t users
-docker run -e JWT_SECRET='n-value-from-jwt' \
+docker run -e JWT_PUBLIC='n-value-from-jwt' \
 -e DATABASE_HOSTNAME='localhost' \
 -e DATABASE_USER='users_service' \
 -e DATABASE_PASSWORD='users_service' \
 -e DATABASE_DB='users_service' \
--e USER_JWT_D='d-value-from-jwt' -p 8080:8080 users
+-e JWT_SECRET='d-value-from-jwt' -p 8080:8080 users
 ```
 
 If you want to run the server without docker the following summary of ENV variables that are needed may be helpful:
 ```bash
-export JWT_SECRET='n-value-from-jwt'
+export JWT_PUBLIC='n-value-from-jwt'
 export DATABASE_HOSTNAME='localhost'
 export DATABASE_USER='users_service'
 export DATABASE_PASSWORD='users_service'
 export DATABASE_DB='users_service' 
-export USER_JWT_D='d-value-from-jwt'
+export JWT_SECRET='d-value-from-jwt'
 ```
 
 ## More Information about JWT and JWKS
