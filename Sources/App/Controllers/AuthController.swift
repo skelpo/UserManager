@@ -13,7 +13,7 @@ final class AuthController: RouteCollection {
     func boot(router: Router) throws {
         
         let auth = router.grouped(any, "users")
-        let restricted = auth.grouped(PermissionsMiddleware<UserStatus, Payload>(allowed: [.admin]))
+        let restricted = auth.grouped(PermissionsMiddleware<Payload>(allowed: [.admin]))
         let protected = auth.grouped(JWTAuthenticatableMiddleware<User>())
         
         auth.post("newPassword", use: newPassword)
