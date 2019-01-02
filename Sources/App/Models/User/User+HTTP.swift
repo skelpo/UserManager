@@ -26,7 +26,7 @@ extension Request {
 
 /// Conforms the `User` model to the `BasicJWTAuthenticatable` protocol.
 /// This allows verfication of the `User` model with `JWTAuthenticatableMiddleware`.
-extension User: BasicJWTAuthenticatable {
+extension User: BasicJWTAuthenticatable {    
     
     /// The key-path for the property to check against `AuthBody.username`
     /// when fetching the user form the database to authenticate.

@@ -19,7 +19,7 @@ final class AuthController: RouteCollection {
     func boot(router: Router) throws {
         
         let auth = router.grouped(any, "users")
-        let restricted = auth.grouped(PermissionsMiddleware<UserStatus, Payload>(allowed: [.admin]))
+        let restricted = auth.grouped(PermissionsMiddleware<Payload>(allowed: [.admin]))
         let protected = auth.grouped(JWTAuthenticatableMiddleware<User>())
         
         auth.post("newPassword", use: newPassword)
@@ -139,8 +139,9 @@ final class AuthController: RouteCollection {
     func refreshAccessToken(_ request: Request)throws -> Future<[String: String]> {
         // Get refresh token from request body and verify it.
         let refreshToken = try request.content.syncGet(String.self, at: "refreshToken")
-        let refreshJWT = try JWT<RefreshToken>(from: refreshToken, verifiedUsing: self.jwtService.signer)
-        try refreshJWT.payload.verify(using: self.jwtService.signer)
+        let refreshJWT = try JWT<RefreshToken>(from: refreshToken, verifiedUsing: signer.signer)
+        try refreshJWT.payload.verify(using: signer.signer)
+
         // Get the user with the ID that was just fetched.
         let userID = refreshJWT.payload.id
         let user = User.find(userID, on: request).unwrap(or: Abort(.badRequest, reason: "No user found with ID '\(userID)'."))
