@@ -10,7 +10,7 @@ import JWT
 
 /// A route controller that handles user authentication with JWT.
 final class AuthController: RouteCollection {
-    private let jwtService:JWTService
+    private let jwtService: JWTService
     
     init(jwtService: JWTService) {
         self.jwtService = jwtService
@@ -139,8 +139,8 @@ final class AuthController: RouteCollection {
     func refreshAccessToken(_ request: Request)throws -> Future<[String: String]> {
         // Get refresh token from request body and verify it.
         let refreshToken = try request.content.syncGet(String.self, at: "refreshToken")
-        let refreshJWT = try JWT<RefreshToken>(from: refreshToken, verifiedUsing: signer.signer)
-        try refreshJWT.payload.verify(using: signer.signer)
+        let refreshJWT = try JWT<RefreshToken>(from: refreshToken, verifiedUsing: self.jwtService.signer)
+        try refreshJWT.payload.verify(using: self.jwtService.signer)
 
         // Get the user with the ID that was just fetched.
         let userID = refreshJWT.payload.id
