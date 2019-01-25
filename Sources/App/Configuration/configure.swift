@@ -87,6 +87,10 @@ public func configure(
     migrations.add(model: Attribute.self, database: .mysql)
     services.register(migrations)
     
+    var commands = CommandConfig()
+    commands.use(HashCommand(), as: "hash")
+    services.register(commands)
+    
     let jwt = JWTDataConfig()
     services.register(jwt)
     
