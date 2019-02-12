@@ -75,7 +75,8 @@ public func configure(
         port: 3306,
         username: user,
         password: Environment.get("DATABASE_PASSWORD") ?? "",
-        database: name
+        database: name,
+        transport: env.isRelease ? .cleartext : .unverifiedTLS
     )
     let database = MySQLDatabase(config: config)
     databases.add(database: database, as: .mysql)
@@ -87,7 +88,7 @@ public func configure(
     migrations.add(model: Attribute.self, database: .mysql)
     services.register(migrations)
     
-    var commands = CommandConfig()
+    var commands = CommandConfig.default()
     commands.use(HashCommand(), as: "hash")
     services.register(commands)
     
