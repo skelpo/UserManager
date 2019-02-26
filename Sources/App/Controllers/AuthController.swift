@@ -19,19 +19,22 @@ final class AuthController: RouteCollection {
     func boot(router: Router) throws {
         
         let auth = router.grouped(any, "users")
-        let restricted = auth.grouped(PermissionsMiddleware<Payload>(allowed: [.admin]))
-        let protected = auth.grouped(JWTAuthenticatableMiddleware<User>())
-        
         auth.post("newPassword", use: newPassword)
         auth.post("accessToken", use: refreshAccessToken)
         
-        restricted.post(User.self, at: "register", use: register)
-        
+        let protected = auth.grouped(JWTAuthenticatableMiddleware<User>())
         protected.post("login", use: login)
         protected.get("status", use: status)
         
         if emailConfirmation {
             auth.get("activate", use: activate)
+        }
+        
+        if openRegistration {
+            auth.post(User.self, at: "register", use: register)
+        } else {
+            let restricted = auth.grouped(PermissionsMiddleware<Payload>(allowed: [.admin]))
+            restricted.post(User.self, at: "register", use: register)
         }
     }
     
