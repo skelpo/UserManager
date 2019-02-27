@@ -19,19 +19,22 @@ final class AuthController: RouteCollection {
     func boot(router: Router) throws {
         
         let auth = router.grouped(any, "users")
-        let restricted = auth.grouped(PermissionsMiddleware<Payload>(allowed: [.admin]))
-        let protected = auth.grouped(JWTAuthenticatableMiddleware<User>())
-        
         auth.post("newPassword", use: newPassword)
         auth.post("accessToken", use: refreshAccessToken)
         
-        restricted.post(User.self, at: "register", use: register)
-        
+        let protected = auth.grouped(JWTAuthenticatableMiddleware<User>())
         protected.post("login", use: login)
         protected.get("status", use: status)
         
         if emailConfirmation {
             auth.get("activate", use: activate)
+        }
+        
+        if openRegistration {
+            auth.post(User.self, at: "register", use: register)
+        } else {
+            let restricted = auth.grouped(PermissionsMiddleware<Payload>(allowed: [.admin]))
+            restricted.post(User.self, at: "register", use: register)
         }
     }
     
@@ -46,11 +49,6 @@ final class AuthController: RouteCollection {
             guard count < 1 else { throw Abort(.badRequest, reason: "This email is already registered.") }
             return user
         }.flatMap(to: User.self) { (user) in
-            
-            // Generate a unique code to verify the user with from the current date and time.
-            let confirmation = Date().description.md5()
-            
-            user.emailCode = confirmation
             user.password = try BCrypt.hash(user.password)
             
             // Get the langauge used to translate text to with Lingo.
@@ -59,25 +57,29 @@ final class AuthController: RouteCollection {
                 user.language = language
             }
             
+            if emailConfirmation {
+                // Generate a unique code to verify the user with from the current date and time.
+                user.emailCode = Date().description.md5()
+            }
+            
             return user.save(on: request)
         }.flatMap(to: User.self) { (user) in
-            let config = try request.make(AppConfig.self)
-            
-            // The URL for the user to confirm their account.
-            guard let confirmation = user.emailCode else { throw Abort(.internalServerError, reason: "Confirmation code was not set") }
-            let url = config.emailURL + confirmation
-            
-            if !user.confirmed {
+            if emailConfirmation && !user.confirmed {
+                guard let confirmation = user.emailCode else {
+                    throw Abort(.internalServerError, reason: "Confirmation code was not set")
+                }
+                let config = try request.make(AppConfig.self)
+                
                 return try request.send(
                     email: "email.activation.text",
                     withSubject: "email.activation.title",
                     from: config.emailFrom,
                     to: user.email,
                     localized: user,
-                    interpolations: ["url": url]
+                    interpolations: ["url": config.emailURL + confirmation]
                 ).transform(to: user)
             } else {
-                return request.eventLoop.newSucceededFuture(result: user)
+                return request.future(user)
             }
         }
             

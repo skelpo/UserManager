@@ -59,23 +59,13 @@ public func configure(
     
     /// Register the configured SQLite database to the database config.
     var databases = DatabasesConfig()
-    
-    guard
-        let host = Environment.get("DATABASE_HOSTNAME"),
-        let user = Environment.get("DATABASE_USER"),
-        let name = Environment.get("DATABASE_DB")
-    else {
-        throw MySQLError(
-            identifier: "missingEnvVars",
-            reason: "One or more expected environment variables are missing: DATABASE_HOSTNAME, DATABASE_USER, DATABASE_DB"
-        )
-    }
     let config = MySQLDatabaseConfig(
-        hostname: host,
-        port: 3306,
-        username: user,
-        password: Environment.get("DATABASE_PASSWORD") ?? "",
-        database: name
+        hostname: Environment.get("DATABASE_HOSTNAME") ?? "localhost",
+        port: Int(Environment.get("DATABASE_PORT") ?? "3306") ?? 3306,
+        username: Environment.get("DATABASE_USER") ?? "root",
+        password: Environment.get("DATABASE_PASSWORD") ?? "password",
+        database: Environment.get("DATABASE_DB") ?? "service_users",
+        transport: env.isRelease ? .cleartext : .unverifiedTLS
     )
     let database = MySQLDatabase(config: config)
     databases.add(database: database, as: .mysql)
@@ -87,6 +77,10 @@ public func configure(
     migrations.add(model: Attribute.self, database: .mysql)
     services.register(migrations)
     
+    var commands = CommandConfig.default()
+    commands.use(HashCommand(), as: "hash")
+    services.register(commands)
+    
     let jwt = JWTDataConfig()
     services.register(jwt)
     
@@ -97,7 +91,7 @@ public func configure(
     let emailURL = Environment.get("EMAIL_URL") ?? "http://localhost:8080/v1/users/activate"
     
     emailConfirmation = Environment.get("EMAIL_CONFIRMATION")=="on"
-    openRegistration = Environment.get("OPEN_REGISTRATION")=="off"
+    openRegistration = Environment.get("OPEN_REGISTRATION")=="on"
     
     /// Register the `AppConfig` service,
     /// used to store arbitrary data.
