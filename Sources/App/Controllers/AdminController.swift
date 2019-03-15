@@ -21,18 +21,18 @@ final class AdminController: RouteCollection {
         // Register handlers with route paths.
         
         // `self.allUsers` to `GET /*/users`.
-        admin.get(any, "users", use: allUsers)
+        admin.get(use: allUsers)
         
         // These routes decode the request's body to a custom type.
         
         // `self.editUser` to `PATCH /*/users/:user`.
-        admin.patch(UserUpdate.self, at: any, "users", User.parameter, use: editUser)
+        admin.patch(UserUpdate.self, at: User.parameter, use: editUser)
         
         // `self.deleteUser` to `DELETE /*/users/:user`.
-        admin.delete(any, "users", User.parameter, use: deleteUser)
+        admin.delete(User.parameter, use: deleteUser)
         
         // `self.editAttribute` to `PATCH /*/attributes/:attribute`.
-        admin.patch(AttributeUpdate.self, at: any, "attributes", Attribute.parameter, use: editAttribute)
+        admin.patch(AttributeUpdate.self, at: "attributes", Attribute.parameter, use: editAttribute)
     }
     
     /// Gets all user models with their attributes.

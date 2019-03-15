@@ -18,14 +18,16 @@ final class UserController: RouteCollection {
     /// - Parameter router: The router to
     ///   register the routes with.
     func boot(router: Router) {
-        router.get("profile", use: profile)
-        router.get("attributes", use: attributes)
+        let users = router.grouped("current")
         
-        router.post(NewUserBody.self, at: "profile", use: save)
-        router.post(AttributeBody.self, at: "attributes", use: createAttribute)
+        users.get("profile", use: profile)
+        users.get("attributes", use: attributes)
         
-        router.delete("attribute", use: deleteAttributes)
-        router.delete("user", use: delete)
+        users.post(NewUserBody.self, at: "profile", use: save)
+        users.post(AttributeBody.self, at: "attributes", use: createAttribute)
+        
+        users.delete("attribute", use: deleteAttributes)
+        users.delete("user", use: delete)
     }
     
     /// Gets the profile data for the authenticated user.
