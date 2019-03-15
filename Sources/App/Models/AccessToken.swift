@@ -64,3 +64,12 @@ extension JSON: JWTPayload {
         // it's payload.
     }
 }
+
+extension JWTError: AbortError {
+    public var status: HTTPResponseStatus {
+        switch self.identifier {
+        case "exp": return .unauthorized
+        default: return .internalServerError
+        }
+    }
+}
