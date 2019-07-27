@@ -1,0 +1,12 @@
+{
+	"title": "Bonjour Swift!",
+	"greeting.message": "Bonjour %{full-name}!",
+	"unread.messages": {
+		"one": "Vous avez un nouveau message.",
+		"other": "Vous avez %{count} nouveaux messages."
+	},
+    "email.activation.title": "Activation",
+    "email.activation.text": "Merci d'activer votre compte : %{url}",
+    "email.password.title": "Nouveau mot de passe",
+    "email.password.text": "Votre nouveau mot de passe est : %{password}"
+}
